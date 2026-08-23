@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Staff Users - Sunrise Dental Clinic</title>
+    <link rel="stylesheet" href="../css/admin-staff.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="nav-brand">
+        <span class="logo-icon">🦷</span>
+        <div>
+            <h2>Sunrise Dental Clinic</h2>
+            <p>Internal Staff Portal</p>
+        </div>
+    </div>
+    <div class="nav-right">
+        <button class="btn-back" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+        <span class="user-badge">🟢 Administrator</span>
+    </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+
+    <div class="page-header">
+        <div>
+            <h2>Manage Staff Accounts</h2>
+            <p>Create and manage receptionists and internal system user credentials.</p>
+        </div>
+        <button class="btn-add" onclick="openAddModal()">+ Add New User</button>
+    </div>
+
+    <!-- Staff Table -->
+    <div class="table-card">
+        <table class="staff-table">
+            <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Full Name</th>
+                <th>Role</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="staffTableBody">
+            <tr>
+                <td><strong>#S-101</strong></td>
+                <td>Kamani Fernando</td>
+                <td><span class="role-badge">Receptionist</span></td>
+                <td>Kamani2026</td>
+                <td><code>Pass123@</code></td>
+                <td><span class="badge active">Active</span></td>
+                <td>
+                    <div class="action-dropdown">
+                        <button class="btn-action">Options ▾</button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="openUpdateModal(this)">✏️ Update Credentials</a>
+                            <a href="#" class="danger-text" onclick="deleteUser(this)">🗑️ Delete (Deactivate)</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>#S-102</strong></td>
+                <td>Saman Kumara</td>
+                <td><span class="role-badge">Clinic Cashier</span></td>
+                <td>Saman2026</td>
+                <td><code>Cash999#</code></td>
+                <td><span class="badge active">Active</span></td>
+                <td>
+                    <div class="action-dropdown">
+                        <button class="btn-action">Options ▾</button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="openUpdateModal(this)">✏️ Update Credentials</a>
+                            <a href="#" class="danger-text" onclick="deleteUser(this)">🗑️ Delete (Deactivate)</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- MODAL 1: Add New User -->
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add New Staff User</h3>
+            <span class="close-btn" onclick="closeAddModal()">&times;</span>
+        </div>
+        <form id="addUserForm" onsubmit="handleAddUser(event)">
+            <div class="form-group">
+                <label>User ID</label>
+                <input type="text" id="addUserId" placeholder="e.g. S-103" required>
+            </div>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="addName" placeholder="e.g. Nimali Jayasinghe" required>
+            </div>
+            <div class="form-group">
+                <label>System Role</label>
+                <select id="addRole" required>
+                    <option value="Receptionist">Receptionist</option>
+                    <option value="Clinic Cashier">Clinic Cashier</option>
+                    <option value="Clinic Manager">Clinic Manager</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="addUsername" placeholder="e.g. Nimali2026" required>
+                <small class="hint-text">Must contain Uppercase, Lowercase & Number (e.g. User123)</small>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="text" id="addPassword" placeholder="e.g. Pass123@" required>
+                <small class="hint-text">Must include Uppercase, Lowercase, Number & Special Char ($ @ # %)</small>
+            </div>
+            <div class="form-group">
+                <label>Account Status</label>
+                <select id="addStatus" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+                <button type="submit" class="btn-save">Save User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 2: Update Credentials -->
+<div id="updateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Update User Credentials</h3>
+            <span class="close-btn" onclick="closeUpdateModal()">&times;</span>
+        </div>
+        <form id="updateUserForm" onsubmit="handleUpdateUser(event)">
+            <div class="form-group">
+                <label>Target User</label>
+                <input type="text" id="updateTarget" readonly style="background-color: #f1f5f9;">
+            </div>
+            <div class="form-group">
+                <label>New Username</label>
+                <input type="text" id="updateUsername" required>
+                <small class="hint-text">Must contain Uppercase, Lowercase & Number</small>
+            </div>
+            <div class="form-group">
+                <label>New Password</label>
+                <input type="text" id="updatePassword" required>
+                <small class="hint-text">Must include Uppercase, Lowercase, Number & Special Char ($ @ # %)</small>
+            </div>
+            <div class="form-group">
+                <label>Account Status</label>
+                <select id="updateStatus" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+                <button type="submit" class="btn-save">Update User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JS Link -->
+<script src="../js/manage-staff.js"></script>
+</body>
+</html>
