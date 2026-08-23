@@ -1,0 +1,413 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 24px 40px;
+}
+
+/* Header Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 12px 24px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 38px;
+    height: 38px;
+    background-color: #0d9488;
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.brand-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.btn-back {
+    text-decoration: none;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background-color: #f8fafc;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-badge {
+    background-color: #ccfbf1;
+    color: #0f766e;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+}
+
+.btn-logout {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Page Title Section */
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Main Grid Layout */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 0.85fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Card Styling */
+.card {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.search-card {
+    margin-bottom: 20px;
+}
+
+/* Search Bar Box */
+.search-group {
+    display: flex;
+    gap: 12px;
+}
+
+.form-control {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #ffffff;
+}
+
+.form-control:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+}
+
+/* Load Bill Button - Balanced Slate Dark Color */
+.btn-load {
+    background-color: #0f172a;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-load:hover {
+    background-color: #1e293b;
+}
+
+/* Itemized Charges Section */
+.section-heading {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 14px;
+}
+
+.patient-info-strip {
+    background-color: #f1f5f9;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: #334155;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.patient-info-strip strong {
+    color: #0f172a;
+}
+
+/* Line Items */
+.charge-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13.5px;
+    color: #334155;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+/* Total Payable Box - Subtle Accent */
+.total-payable-box {
+    background-color: #ccfbf1;
+    color: #0f766e;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+    margin: 18px 0;
+}
+
+.total-payable-amount {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+/* Payment Selector */
+.payment-selector-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 10px;
+}
+
+.payment-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.payment-option {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #334155;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+.payment-option input {
+    accent-color: #0d9488;
+}
+
+.payment-option:hover {
+    border-color: #0d9488;
+    background-color: #f8fafc;
+}
+
+/* Finalize Button */
+.btn-finalize {
+    width: 100%;
+    background-color: #0d9488;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-finalize:hover {
+    background-color: #0f766e;
+}
+
+/* Thermal Receipt Box */
+.receipt-preview-header {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #475569;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.thermal-receipt {
+    border: 1px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #ffffff;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.receipt-title {
+    text-align: center;
+    font-weight: 800;
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.receipt-subtext {
+    text-align: center;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.receipt-dashed-line {
+    border: none;
+    border-top: 1px dashed #cbd5e1;
+    margin: 12px 0;
+}
+
+.receipt-meta {
+    font-size: 12px;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+.receipt-item-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.receipt-total-bar {
+    background-color: #0d9488;
+    color: white;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    font-size: 13px;
+    margin: 12px 0;
+    border-radius: 4px;
+}
+
+.barcode-area {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.barcode-img {
+    letter-spacing: 4px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #0f172a;
+}
+
+.thank-you-msg {
+    text-align: center;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 6px;
+}
+
+/* Print Button Only */
+.btn-print-official {
+    width: 100%;
+    background-color: #0d9488;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-print-official:hover {
+    background-color: #0f766e;
+}
+
+/* Print Only Rule */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .thermal-receipt, .thermal-receipt * {
+        visibility: visible;
+    }
+    .thermal-receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+    }
+}

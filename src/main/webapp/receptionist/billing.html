@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculate & Generate Bill Receipt - Sunrise Dental Clinic</title>
+    <link rel="stylesheet" href="../css/billing.css">
+</head>
+<body>
+
+<!-- Header Navbar -->
+<header class="navbar">
+    <div class="brand-section">
+        <div class="logo-icon">🦷</div>
+        <div class="brand-title">Sunrise Dental Clinic (Colombo)</div>
+    </div>
+
+    <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+
+    <div class="nav-right">
+        <div class="user-badge">
+            <span class="status-dot"></span> Receptionist
+        </div>
+        <button class="btn-logout" onclick="location.href='../index.html'">Logout</button>
+    </div>
+</header>
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">🧾 Calculate & Generate Bill Receipt</h1>
+    <p class="page-subtitle">Search patient record, review line-item charges, process payment, and print receipt.</p>
+</div>
+
+<!-- Main Grid -->
+<div class="layout-grid">
+
+    <!-- Left Side Form & Items -->
+    <div>
+        <!-- Search Card -->
+        <div class="card search-card">
+            <div class="search-group">
+                <input type="text" id="apptSearchInput" class="form-control" placeholder="Enter Appointment ID, e.g., APT-1001..." value="APT-1001">
+                <button type="button" class="btn-load" onclick="loadBillData()">🔍 Load Bill</button>
+            </div>
+        </div>
+
+        <!-- Itemized Charges Card -->
+        <div class="card">
+            <div class="section-heading">Itemized Charges</div>
+
+            <!-- Patient Summary Strip -->
+            <div class="patient-info-strip">
+                <strong>Patient:</strong> <span id="pName">Nimal Fernando</span> &nbsp;|&nbsp;
+                <strong>Token:</strong> <span id="pToken">APT-1001</span> &nbsp;|&nbsp;
+                <strong>Doctor:</strong> <span id="pDoctor">Dr. Perera</span>
+            </div>
+
+            <!-- Charges List -->
+            <div class="charge-row">
+                <span>Doctor Consultation Fee: LKR 2,000</span>
+                <span id="feeConsultation">LKR 2,000</span>
+            </div>
+            <div class="charge-row">
+                <span>Root Canal Treatment: LKR 25,000</span>
+                <span id="feeTreatment">LKR 25,000</span>
+            </div>
+
+            <!-- Total Payable Bar -->
+            <div class="total-payable-box">
+                <span>Total Payable Amount:</span>
+                <span class="total-payable-amount" id="lblTotalPayable">LKR 27,000</span>
+            </div>
+
+            <!-- Payment Method Selector -->
+            <div class="payment-selector-title">Payment Method Selector</div>
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="Cash" checked>
+                    <span>💵 Cash</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="Card">
+                    <span>💳 Credit/Debit Card</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="paymentMethod" value="Online">
+                    <span>📱 Online Transfer</span>
+                </label>
+            </div>
+
+            <!-- Action Button -->
+            <button type="button" class="btn-finalize" onclick="finalizeReceipt()">
+                Finalize & Generate Receipt
+            </button>
+        </div>
+    </div>
+
+    <!-- Printable Thermal Receipt Preview -->
+    <div class="card">
+        <div class="receipt-preview-header">Printable Thermal Receipt Preview</div>
+
+        <div class="thermal-receipt" id="printableReceipt">
+            <div class="receipt-title">SUNRISE DENTAL CLINIC - COLOMBO</div>
+            <div class="receipt-subtext">AddressDental Clinic, Colombo,</div>
+            <div class="receipt-subtext">Cto/ita A30 - 20593</div>
+            <div class="receipt-subtext" style="margin-top:4px;">Aug 20, 2026 - 10:30 AM</div>
+
+            <hr class="receipt-dashed-line">
+
+            <div class="receipt-meta">
+                Token #<span id="recToken">APT-1001</span><br>
+                Patient: <span id="recPatient">Nimal Fernando</span><br>
+                Dentist: <span id="recDoctor">Dr. Perera</span>
+            </div>
+
+            <hr class="receipt-dashed-line">
+
+            <div class="receipt-item-row">
+                <span>Consultation Fee:</span>
+                <span>LKR 2,000.00</span>
+            </div>
+            <div class="receipt-item-row">
+                <span>Root Canal Treatment:</span>
+                <span>LKR 25,000.00</span>
+            </div>
+
+            <div class="receipt-total-bar">
+                <span>TOTAL DUE:</span>
+                <span id="recTotal">LKR 27,000.00</span>
+            </div>
+
+            <div class="barcode-area">
+                <div class="barcode-img">||||| | |||| ||| ||||</div>
+            </div>
+            <div class="thank-you-msg">Thank you for visiting Sunrise Dental Clinic!</div>
+        </div>
+
+        <!-- print recipt button  -->
+        <button type="button" class="btn-print-official" onclick="window.print()">
+            🖨️ Print Official Receipt
+        </button>
+    </div>
+
+</div>
+<script src="../js/billing.js"></script>
+</body>
+</html>
