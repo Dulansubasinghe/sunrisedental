@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Dentists - Sunrise Dental Clinic</title>
+  <link rel="stylesheet" href="../css/admin-dentists.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo-icon">🦷</span>
+    <div>
+      <h2>Sunrise Dental Clinic</h2>
+      <p>Internal Staff Portal</p>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-back" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    <span class="user-badge">🟢 Administrator</span>
+  </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+
+  <div class="page-header">
+    <div>
+      <h2>Manage Dental Practitioners</h2>
+      <p>View, add, update, or deactivate dentists in the system.</p>
+    </div>
+    <button class="btn-add" onclick="openAddModal()">+ Add New Dentist</button>
+  </div>
+
+  <!-- Dentists Table -->
+  <div class="table-card">
+    <table class="dentist-table">
+      <thead>
+      <tr>
+        <th>Dentist ID</th>
+        <th>Dentist Name</th>
+        <th>Specialization</th>
+        <th>Consultation Fee</th>
+        <th>Contact No</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="dentistTableBody">
+      <tr>
+        <td><strong>#D-101</strong></td>
+        <td>Dr. Nimal Perera</td>
+        <td>Orthodontist</td>
+        <td>LKR 2,500.00</td>
+        <td>0771234567</td>
+        <td><span class="badge active">Active</span></td>
+        <td>
+          <div class="action-dropdown">
+            <button class="btn-action">Options ▾</button>
+            <div class="dropdown-content">
+              <a href="javascript:void(0)" onclick="openUpdateModal(this)">✏️ Update Details</a>
+              <a href="javascript:void(0)" class="danger-text" onclick="deleteDentist(this)">🗑️ Delete (Deactivate)</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>#D-102</strong></td>
+        <td>Dr. Dilini Silva</td>
+        <td>General Dentist</td>
+        <td>LKR 2,000.00</td>
+        <td>0719876543</td>
+        <td><span class="badge inactive">Inactive</span></td>
+        <td>
+          <div class="action-dropdown">
+            <button class="btn-action">Options ▾</button>
+            <div class="dropdown-content">
+              <a href="javascript:void(0)" onclick="openUpdateModal(this)">✏️ Update Details</a>
+              <a href="javascript:void(0)" class="danger-text" onclick="deleteDentist(this)">🗑️ Delete (Deactivate)</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL 1: Add New Dentist -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add New Dentist</h3>
+      <span class="close-btn" onclick="closeAddModal()">&times;</span>
+    </div>
+    <form id="addDentistForm" onsubmit="handleAddDentist(event)">
+      <div class="form-group">
+        <label>Dentist ID</label>
+        <input type="text" id="addId" placeholder="e.g. D-103" required>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="addName" placeholder="Dr. Firstname Lastname" required>
+      </div>
+      <div class="form-group">
+        <label>Specialization</label>
+        <select id="addSpec" required>
+          <option value="">Select Specialization</option>
+          <option value="General Dentist">General Dentist</option>
+          <option value="Orthodontist">Orthodontist</option>
+          <option value="Oral Surgeon">Oral Surgeon</option>
+          <option value="Pediatric Dentist">Pediatric Dentist</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Consultation Fee (LKR)</label>
+        <input type="number" id="addFee" placeholder="2500" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label>Contact Number</label>
+        <input type="text" id="addContact" placeholder="07XXXXXXXX" required>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="addStatus" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn-save">Save Dentist</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2: Update Dentist -->
+<div id="updateModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Update Dentist Details</h3>
+      <span class="close-btn" onclick="closeUpdateModal()">&times;</span>
+    </div>
+    <form id="updateDentistForm" onsubmit="handleUpdateDentist(event)">
+      <div class="form-group">
+        <label>Dentist Target</label>
+        <input type="text" id="updateDentistName" readonly style="background-color: #f1f5f9;">
+      </div>
+      <div class="form-group">
+        <label>Consultation Fee (LKR)</label>
+        <input type="number" id="updateFee" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label>Contact Number</label>
+        <input type="text" id="updateContact" required>
+      </div>
+      <div class="form-group">
+        <label>Availability / Status</label>
+        <select id="updateStatus" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+        <button type="submit" class="btn-save">Update Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JS Link -->
+<script src="../js/manage-dentists.js"></script>
+</body>
+</html>
