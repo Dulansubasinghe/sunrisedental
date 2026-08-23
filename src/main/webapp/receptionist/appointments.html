@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Appointment - Sunrise Dental Clinic</title>
+    <link rel="stylesheet" href="../css/appointments.css">
+</head>
+<body>
+
+<!-- Header Navbar -->
+<header class="navbar">
+    <div class="brand-section">
+        <div class="logo-icon">🦷</div>
+        <div>
+            <div class="brand-title">Sunrise Dental Clinic <span style="color:#64748b; font-weight:400;">(Colombo)</span></div>
+            <div class="brand-subtitle">Internal Staff Portal</div>
+        </div>
+    </div>
+
+    <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+
+    <div class="nav-right">
+        <div class="user-badge">
+            <span class="status-dot"></span>
+            <span id="userName">Receptionist</span>
+        </div>
+        <button class="btn-logout" onclick="location.href='../index.html'">↳ Logout</button>
+    </div>
+</header>
+
+<!-- Page Title -->
+<div class="page-header">
+    <h1 class="page-title">Register Appointment</h1>
+    <p class="page-subtitle">Fill in patient and treatment details</p>
+</div>
+
+<!-- Main Layout Grid -->
+<div class="layout-grid">
+
+    <!-- Left Form Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="header-icon icon-teal">📅</div>
+            <div>
+                <div class="section-title">Appointment Details</div>
+                <div class="section-subtitle">Fill in patient and treatment details</div>
+            </div>
+        </div>
+
+        <form id="appointmentForm">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="appointmentNo">Appointment No (Auto)</label>
+                    <input type="text" id="appointmentNo" name="appointmentNo" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="contact">Contact Number (10 Digits)</label>
+                    <input type="text" id="contact" name="contact" class="form-control" placeholder="07XXXXXXXX" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label for="patientName">Patient Full Name</label>
+                    <input type="text" id="patientName" name="patientName" class="form-control" placeholder="e.g. Nimal Fernando">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" name="address" class="form-control" placeholder="e.g. 24 Galle Road, Colombo 03">
+                </div>
+
+                <!-- Step 6: Swapped - Treatment Type First -->
+                <div class="form-group">
+                    <label for="treatment">Treatment Type</label>
+                    <select id="treatment" name="treatmentType" class="form-control">
+                        <option value="">-- Select Treatment --</option>
+                        <option value="General Cleaning" data-price="5000">General Cleaning — LKR 5,000</option>
+                        <option value="Tooth Extraction" data-price="8000">Tooth Extraction — LKR 8,000</option>
+                        <option value="Teeth Whitening" data-price="15000">Teeth Whitening — LKR 15,000</option>
+                        <option value="Root Canal Treatment" data-price="25000">Root Canal Treatment — LKR 25,000</option>
+                        <option value="Dental Filling" data-price="10000">Dental Filling — LKR 10,000</option>
+                        <option value="Dental Braces" data-price="80000">Dental Braces — LKR 80,000</option>
+                    </select>
+                </div>
+
+                <!-- Step 6: Swapped - Dentist Second -->
+                <div class="form-group">
+                    <label for="dentist">Dentist</label>
+                    <select id="dentist" name="doctorId" class="form-control">
+                        <option value="">-- Select Treatment First --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="consultationFee">Consultation Fee (LKR)</label>
+                    <input type="number" id="consultationFee" name="consultationFee" class="form-control" placeholder="e.g. 2000" value="2000">
+                </div>
+
+                <div class="form-group">
+                    <label for="appointmentDate">Date & Time</label>
+                    <input type="datetime-local" id="appointmentDate" name="appointmentDate" class="form-control">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register">
+                <span>📅</span> Register Appointment
+            </button>
+
+            <!-- Success Alert -->
+            <div id="alertSuccess" class="alert-success">
+                <span>✔</span> <span id="successMsg">Appointment registered. Receipt generated below.</span>
+            </div>
+
+            <!-- Error Alert -->
+            <div id="alertError" class="alert-error">
+                <span>⚠️</span> <span id="errorMsgText">Please fill in all required details before registering the appointment.</span>
+            </div>
+        </form>
+    </div>
+
+    <!-- Right Bill Receipt Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="header-icon icon-blue">🩺</div>
+            <div>
+                <div class="section-title">Bill Receipt</div>
+                <div class="section-subtitle">Printable preview</div>
+            </div>
+        </div>
+
+        <div class="receipt-box">
+            <div class="clinic-header">
+                <div class="clinic-name">Sunrise Dental Clinic</div>
+                <div class="clinic-address">Colombo, Sri Lanka</div>
+            </div>
+
+            <hr class="receipt-divider">
+
+            <div class="meta-row">
+                <span class="meta-label">Patient Name</span>
+                <span id="recPatientName" class="meta-value">—</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Appointment ID</span>
+                <span id="recAppointmentId" class="meta-value">—</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Dentist Name</span>
+                <span id="recDentistName" class="meta-value">—</span>
+            </div>
+
+            <div class="receipt-subtitle">Bill Details</div>
+
+            <div class="bill-row">
+                <span>Consultation Fee</span>
+                <span id="recConsultationFee">LKR 0</span>
+            </div>
+            <div class="bill-row">
+                <span id="recTreatmentName">Treatment</span>
+                <span id="recTreatmentFee">LKR 0</span>
+            </div>
+
+            <div class="total-box">
+                <span>Total Bill:</span>
+                <span id="recTotalBill">LKR 0</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="../js/appointment.js"></script>
+</body>
+</html>
