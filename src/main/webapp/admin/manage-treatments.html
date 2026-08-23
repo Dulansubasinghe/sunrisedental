@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Treatments - Sunrise Dental Clinic</title>
+  <link rel="stylesheet" href="../css/admin-treatments.css">
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <span class="logo-icon">🦷</span>
+    <div>
+      <h2>Sunrise Dental Clinic</h2>
+      <p>Internal Staff Portal</p>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="btn-back" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    <span class="user-badge">🟢 Administrator</span>
+  </div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+
+  <div class="page-header">
+    <div>
+      <h2>Manage Dental Treatments</h2>
+      <p>Configure treatments, standard consultation fees, and estimated duration.</p>
+    </div>
+    <button class="btn-add" onclick="openAddModal()">+ Add New Treatment</button>
+  </div>
+
+  <!-- Treatments Table -->
+  <div class="table-card">
+    <table class="treatment-table">
+      <thead>
+      <tr>
+        <th>Treatment ID</th>
+        <th>Treatment Name</th>
+        <th>Standard Fee</th>
+        <th>Estimated Duration</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody id="treatmentTableBody">
+      <tr>
+        <td><strong>#TRT-101</strong></td>
+        <td>Dental Scaling & Polishing</td>
+        <td>LKR 3,500.00</td>
+        <td>30 Mins</td>
+        <td><span class="badge active">Active</span></td>
+        <td>
+          <div class="action-dropdown">
+            <button class="btn-action">Options ▾</button>
+            <div class="dropdown-content">
+              <a href="javascript:void(0)" onclick="openUpdateModal(this)">✏️ Update Details</a>
+              <a href="javascript:void(0)" class="danger-text" onclick="deleteTreatment(this)">🗑️ Delete (Deactivate)</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>#TRT-102</strong></td>
+        <td>Tooth Extraction (Simple)</td>
+        <td>LKR 2,500.00</td>
+        <td>20 Mins</td>
+        <td><span class="badge active">Active</span></td>
+        <td>
+          <div class="action-dropdown">
+            <button class="btn-action">Options ▾</button>
+            <div class="dropdown-content">
+              <a href="javascript:void(0)" onclick="openUpdateModal(this)">✏️ Update Details</a>
+              <a href="javascript:void(0)" class="danger-text" onclick="deleteTreatment(this)">🗑️ Delete (Deactivate)</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><strong>#TRT-103</strong></td>
+        <td>Root Canal Treatment (RCT)</td>
+        <td>LKR 15,000.00</td>
+        <td>60 Mins</td>
+        <td><span class="badge active">Active</span></td>
+        <td>
+          <div class="action-dropdown">
+            <button class="btn-action">Options ▾</button>
+            <div class="dropdown-content">
+              <a href="javascript:void(0)" onclick="openUpdateModal(this)">✏️ Update Details</a>
+              <a href="javascript:void(0)" class="danger-text" onclick="deleteTreatment(this)">🗑️ Delete (Deactivate)</a>
+            </div>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL 1: Add New Treatment -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Add New Treatment</h3>
+      <span class="close-btn" onclick="closeAddModal()">&times;</span>
+    </div>
+    <form id="addTreatmentForm" onsubmit="handleAddTreatment(event)">
+      <div class="form-group">
+        <label>Treatment ID</label>
+        <input type="text" id="addId" placeholder="e.g. TRT-104" required>
+      </div>
+      <div class="form-group">
+        <label>Treatment Name</label>
+        <input type="text" id="addName" placeholder="e.g. Teeth Whitening" required>
+      </div>
+      <div class="form-group">
+        <label>Standard Fee (LKR)</label>
+        <input type="number" id="addFee" placeholder="4500" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label>Estimated Duration</label>
+        <select id="addDuration" required>
+          <option value="15 Mins">15 Mins</option>
+          <option value="20 Mins">20 Mins</option>
+          <option value="30 Mins" selected>30 Mins</option>
+          <option value="45 Mins">45 Mins</option>
+          <option value="60 Mins">60 Mins</option>
+          <option value="90 Mins">90 Mins</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="addStatus" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn-save">Save Treatment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL 2: Update Treatment Details -->
+<div id="updateModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Update Treatment Details</h3>
+      <span class="close-btn" onclick="closeUpdateModal()">&times;</span>
+    </div>
+    <form id="updateTreatmentForm" onsubmit="handleUpdateTreatment(event)">
+      <div class="form-group">
+        <label>Treatment ID Target</label>
+        <input type="text" id="updateTargetId" readonly style="background-color: #f1f5f9;">
+      </div>
+      <div class="form-group">
+        <label>Treatment Name</label>
+        <input type="text" id="updateName" required>
+      </div>
+      <div class="form-group">
+        <label>Standard Fee (LKR)</label>
+        <input type="number" id="updateFee" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label>Estimated Duration</label>
+        <select id="updateDuration" required>
+          <option value="15 Mins">15 Mins</option>
+          <option value="20 Mins">20 Mins</option>
+          <option value="30 Mins">30 Mins</option>
+          <option value="45 Mins">45 Mins</option>
+          <option value="60 Mins">60 Mins</option>
+          <option value="90 Mins">90 Mins</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="updateStatus" required>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeUpdateModal()">Cancel</button>
+        <button type="submit" class="btn-save">Update Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JS Link -->
+<script src="../js/manage-treatments.js"></script>
+</body>
+</html>
