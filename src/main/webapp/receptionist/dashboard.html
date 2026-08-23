@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sunrise Dental Clinic - Home</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="brand-section">
+        <div class="logo-icon">🦷</div>
+        <div>
+            <div class="brand-title">Sunrise Dental Clinic <span style="color:#64748b; font-weight:400;">(Colombo)</span></div>
+            <div class="brand-subtitle">Internal Staff Portal</div>
+        </div>
+    </div>
+    <div class="nav-controls">
+        <a href="#" class="nav-link active">Home</a>
+        <a href="javascript:void(0)" class="nav-link" onclick="openHelpModal()">Help Guide</a>
+        <div class="user-badge">
+            <span class="status-dot"></span> Welcome, Receptionist
+        </div>
+        <button class="btn-logout" onclick="logout()">↳ Logout</button>
+    </div>
+</header>
+
+<section class="action-grid">
+    <div class="card" onclick="location.href='appointments.html'">
+        <div class="card-icon icon-green">📋</div>
+        <div class="card-title">Register New Appointment</div>
+        <div class="card-desc">Book a patient visit</div>
+    </div>
+
+    <div class="card" onclick="location.href='appointment-details.html'">
+        <div class="card-icon icon-blue">🔍</div>
+        <div class="card-title">Appointment Details</div>
+        <div class="card-desc">Search and view bookings</div>
+    </div>
+
+    <div class="card" onclick="location.href='billing.html'">
+        <div class="card-icon icon-purple">🧾</div>
+        <div class="card-title">Calculate and Print Bill</div>
+        <div class="card-desc">Generate patient receipts</div>
+    </div>
+</section>
+
+<!-- Today's Appoinments count -->
+<section class="status-grid">
+    <div class="card" style="cursor: default;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="card-icon icon-green" style="margin-bottom:0;">📅</div>
+            <div>
+                <div class="card-desc">Today's Appointments</div>
+                <div class="today-count">14</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Dentist list -->
+    <div class="card" style="cursor: default;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+            <div class="card-icon icon-blue" style="margin-bottom:0;">🩺</div>
+            <div class="card-desc">Active Dentists</div>
+        </div>
+
+        <div class="dentist-list">
+            <div class="dentist-item">
+                <span class="dentist-name">Dr. Perera — <span style="font-weight:400; color:#64748b;">Orthodontist</span></span>
+                <span class="badge-available"><span class="status-dot"></span> Available</span>
+            </div>
+            <div class="dentist-item">
+                <span class="dentist-name">Dr. Silva — <span style="font-weight:400; color:#64748b;">Dental Surgeon</span></span>
+                <span class="badge-consulting"><span class="status-dot" style="background:#d97706;"></span> In-Consultation</span>
+            </div>
+            <div class="dentist-item">
+                <span class="dentist-name">Dr. Wickramasinghe — <span style="font-weight:400; color:#64748b;">General</span></span>
+                <span class="badge-available"><span class="status-dot"></span> Available</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Full Help Guide Modal Popup -->
+<div id="helpModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>❓ Help & System Support Center</h2>
+            <span class="close-btn" onclick="closeHelpModal()">&times;</span>
+        </div>
+
+        <div class="modal-body">
+
+            <!-- FAQ Accordion Section -->
+            <div class="modal-section-title">Frequently Asked Questions</div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>📅 How to register a new patient appointment?</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="faq-answer">
+                        Click on <strong>"Register New Appointment"</strong> card from the dashboard, enter patient details, select the dentist, choose an available time slot, and submit.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>🧾 How to generate and print billing receipts?</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="faq-answer">
+                        Select <strong>"Calculate and Print Bill"</strong>, search by Appointment ID or Patient Name, verify treatment fees, and click <strong>"Print Invoice"</strong>.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>📊 How to view daily appointment & income reports?</span>
+                        <span class="arrow">▼</span>
+                    </button>
+                    <div class="faq-answer">
+                        Go to <strong>"Management Reports"</strong> card. Filter data by date range or dentist to view revenue summaries and activity logs.
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Support Contact Section -->
+            <div class="modal-section-title" style="margin-top: 20px;">Emergency IT Support Contact</div>
+            <div class="support-grid">
+                <div class="support-card">
+                    <div class="support-icon">📞</div>
+                    <div>
+                        <div class="support-label">IT Hotline</div>
+                        <div class="support-val">+94 11 234 5678</div>
+                    </div>
+                </div>
+                <div class="support-card">
+                    <div class="support-icon">✉️</div>
+                    <div>
+                        <div class="support-label">Email Support</div>
+                        <div class="support-val">support@sunrisedental.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Issue Reporting -->
+            <div class="modal-section-title" style="margin-top: 20px;">Report an Issue / Ticket</div>
+            <form id="supportForm" onsubmit="submitTicket(event)" class="ticket-form">
+                <div class="form-group">
+                    <label>Issue Type</label>
+                    <select id="issueType" required>
+                        <option value="">Select Category</option>
+                        <option value="system-bug">System Error / Bug</option>
+                        <option value="billing-issue">Billing / Payment Calculation Error</option>
+                        <option value="appointment-issue">Appointment Booking Issue</option>
+                        <option value="other">Other Query</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="issueDesc" rows="3" placeholder="Briefly describe what went wrong..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit-ticket">📩 Send Ticket to Admin</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script src="../js/dashboard.js"></script>
+</body>
+</html>
