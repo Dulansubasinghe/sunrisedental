@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sunrise Dental Clinic</title>
+    <link rel="stylesheet" href="../css/admin-dashboard.css">
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<nav class="navbar">
+    <div class="nav-brand">
+        <span class="logo-icon">🦷</span>
+        <div>
+            <h2>Sunrise Dental Clinic</h2>
+            <p>Internal Staff Portal</p>
+        </div>
+    </div>
+    <div class="nav-right">
+        <span class="user-badge">🟢 Administrator</span>
+        <button class="btn-logout" onclick="window.location.href='../index.html'">Logout</button>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+
+    <!-- Section 1: Executive KPI Summary -->
+    <div class="section-header">
+        <div>
+            <h2>Executive Clinic Summary</h2>
+            <p>Real-time analytics and financial metrics</p>
+        </div>
+        <div class="filter-box">
+            <select id="analyticsFilter">
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month" selected>This Month</option>
+                <option value="all">All Time</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <!-- Total Revenue Card (Clickable to open management reports) -->
+        <div class="kpi-card clickable" onclick="window.location.href='management-reports.html'">
+            <div class="kpi-icon revenue">💵</div>
+            <div class="kpi-info">
+                <span>Total Revenue ↗</span>
+                <h3>LKR 450,000</h3>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon appointments">📅</div>
+            <div class="kpi-info">
+                <span>Total Appointments</span>
+                <h3>128</h3>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon patients">👥</div>
+            <div class="kpi-info">
+                <span>Registered Patients</span>
+                <h3>84</h3>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-icon dentists">🩺</div>
+            <div class="kpi-info">
+                <span>Active Dentists</span>
+                <h3>05</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Management Controls -->
+    <div class="section-header" style="margin-top: 36px;">
+        <div>
+            <h2>System Management</h2>
+            <p>Configure staff, dental practitioners, and view management reports</p>
+        </div>
+    </div>
+
+    <div class="action-grid">
+        <div class="action-card">
+            <div class="action-icon">🩺</div>
+            <h3>Manage Dentists</h3>
+            <p>Add new dentists, update specialization details, and control doctor availability.</p>
+            <button class="btn-action" onclick="window.location.href='manage-dentists.html'">Open Panel</button>
+        </div>
+
+        <div class="action-card">
+            <div class="action-icon">👤</div>
+            <h3>Manage Staff Users</h3>
+            <p>Create receptionist accounts, reset credentials, and grant portal access permissions.</p>
+            <button class="btn-action" onclick="window.location.href='manage-staff.html'">Open Panel</button>
+        </div>
+
+        <div class="action-card">
+            <div class="action-icon">💉</div>
+            <h3>Manage Treatments</h3>
+            <p>Configure dental treatments, standard charges, and base consultation fees.</p>
+            <button class="btn-action" onclick="window.location.href='manage-treatments.html'">Open Panel</button>
+        </div>
+
+        <!-- 4th Action Card added for Reports -->
+        <div class="action-card">
+            <div class="action-icon">📊</div>
+            <h3>Management Reports</h3>
+            <p>Analyze income summaries, doctor patient loads, and treatment revenue trends.</p>
+            <button class="btn-action" onclick="window.location.href='management-reports.html'">View Reports</button>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
