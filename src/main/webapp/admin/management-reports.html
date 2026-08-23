@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Management Reports - Sunrise Dental Clinic</title>
+
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="../css/management-reports.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- Full Width Top Navbar -->
+<header class="navbar">
+    <div class="brand-section">
+        <div class="logo-icon">🦷</div>
+        <div>
+            <div class="brand-title">Sunrise Dental Clinic</div>
+            <div class="brand-subtitle">Internal Staff Portal</div>
+        </div>
+    </div>
+
+    <div class="nav-actions">
+        <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+        <span class="user-badge">
+            <span class="status-dot"></span> Administrator
+        </span>
+    </div>
+</header>
+
+<!-- Main Page Container with Padding -->
+<div class="main-content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Executive Management Reports</h1>
+            <p class="page-subtitle">Track income, doctor patient load, and appointment schedules by period</p>
+        </div>
+        <div class="action-buttons">
+            <button class="btn-export" onclick="exportToCSV()">📥 Export CSV</button>
+            <button class="btn-print" onclick="window.print()">🖨️ Print Report</button>
+        </div>
+    </div>
+
+    <!-- Dynamic Filter Control -->
+    <div class="filter-card">
+        <div class="filter-group">
+            <label for="periodFilter">📅 Select Time Period</label>
+            <select id="periodFilter" class="form-control" onchange="handlePeriodChange()">
+                <option value="TODAY">Today </option>
+                <option value="THIS_WEEK" selected>This Week </option>
+                <option value="LAST_WEEK">Last Week </option>
+                <option value="THIS_MONTH">This Month </option>
+                <option value="CUSTOM">Custom Date Range</option>
+            </select>
+        </div>
+
+        <div class="filter-group" id="fromDateWrapper" style="display: none;">
+            <label for="fromDate">From Date</label>
+            <input type="date" id="fromDate" class="form-control">
+        </div>
+
+        <div class="filter-group" id="toDateWrapper" style="display: none;">
+            <label for="toDate">To Date</label>
+            <input type="date" id="toDate" class="form-control">
+        </div>
+
+        <!-- Filter by Dentist -->
+        <div class="filter-group">
+            <label for="doctorFilter">👨‍⚕️ Filter by Dentist</label>
+            <select id="doctorFilter" class="form-control" onchange="applyFilters()">
+                <option value="ALL">All Dentists</option>
+                <option value="Dr. Perera">Dr. Perera</option>
+                <option value="Dr. Silva">Dr. Silva</option>
+                <option value="Dr. Wickramasinghe">Dr. Wickramasinghe</option>
+            </select>
+        </div>
+
+        <!-- Filter by Treatment -->
+        <div class="filter-group">
+            <label for="treatmentFilter">🦷 Filter by Treatment</label>
+            <select id="treatmentFilter" class="form-control" onchange="applyFilters()">
+                <option value="ALL">All Treatments</option>
+                <option value="Dental Braces">Dental Braces</option>
+                <option value="Tooth Extraction">Tooth Extraction</option>
+                <option value="Dental Filling">Dental Filling</option>
+                <option value="Root Canal">Root Canal</option>
+                <option value="Teeth Cleaning">Teeth Cleaning</option>
+            </select>
+        </div>
+
+        <button class="btn-apply-filter" onclick="applyFilters()">Apply Filter</button>
+    </div>
+
+    <!-- KPI Indicators -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Total Revenue</div>
+            <div class="kpi-value" id="kpiTotalRevenue">LKR 0</div>
+            <div class="kpi-subtext">Selected Period</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Total Patients Seen</div>
+            <div class="kpi-value" id="kpiTotalPatients">0 Patients</div>
+            <div class="kpi-subtext">Appointments Completed</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Top Revenue Treatment</div>
+            <div class="kpi-value" id="kpiTopTreatment">—</div>
+            <div class="kpi-subtext">Highest Earning</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Total Appointments</div>
+            <div class="kpi-value" id="kpiTotalAppointments">0 Bookings</div>
+            <div class="kpi-subtext">Total Scheduled Visits</div>
+        </div>
+    </div>
+
+    <div class="grid-2-cols">
+        <!-- Dentist Performance -->
+        <div class="card">
+            <div class="card-title">👨‍⚕️ Dentist Patient & Revenue Summary</div>
+            <table class="custom-table">
+                <thead>
+                <tr>
+                    <th>Dentist Name</th>
+                    <th>Specialization</th>
+                    <th>Patients Seen</th>
+                    <th>Total Generated</th>
+                </tr>
+                </thead>
+                <tbody id="dentistSummaryBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Treatment Income -->
+        <div class="card">
+            <div class="card-title">🦷 Revenue by Treatment</div>
+            <table class="custom-table" style="margin-bottom: 16px;">
+                <thead>
+                <tr>
+                    <th>Treatment</th>
+                    <th>Count</th>
+                    <th>Income</th>
+                </tr>
+                </thead>
+                <tbody id="treatmentSummaryBody"></tbody>
+            </table>
+
+            <div class="chart-container">
+                <canvas id="treatmentChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointments Master Table -->
+    <div class="card">
+        <div class="card-title">📅 Appointment Schedule & Billing Details</div>
+        <table class="custom-table" id="appointmentsReportTable">
+            <thead>
+            <tr>
+                <th>Appt ID</th>
+                <th>Date</th>
+                <th>Patient Name</th>
+                <th>Assigned Dentist</th>
+                <th>Treatment</th>
+                <th>Status</th>
+                <th>Billing Fee</th>
+            </tr>
+            </thead>
+            <tbody id="reportTableBody">
+            <tr data-date="2026-08-20" data-doctor="Dr. Perera" data-treatment="Dental Braces" data-fee="82000">
+                <td><strong>APT-1001</strong></td>
+                <td>2026-08-20</td>
+                <td>Nimal Fernando</td>
+                <td>Dr. Perera</td>
+                <td>Dental Braces</td>
+                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
+                <td class="amount-text">LKR 82,000</td>
+            </tr>
+            <tr data-date="2026-08-20" data-doctor="Dr. Silva" data-treatment="Tooth Extraction" data-fee="10000">
+                <td><strong>APT-1002</strong></td>
+                <td>2026-08-20</td>
+                <td>Kasun Jayasinghe</td>
+                <td>Dr. Silva</td>
+                <td>Tooth Extraction</td>
+                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
+                <td class="amount-text">LKR 10,000</td>
+            </tr>
+            <tr data-date="2026-08-19" data-doctor="Dr. Wickramasinghe" data-treatment="Dental Filling" data-fee="12000">
+                <td><strong>APT-1003</strong></td>
+                <td>2026-08-19</td>
+                <td>Sunil Perera</td>
+                <td>Dr. Wickramasinghe</td>
+                <td>Dental Filling</td>
+                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
+                <td class="amount-text">LKR 12,000</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="../js/management-reports.js"></script>
+</body>
+</html>
