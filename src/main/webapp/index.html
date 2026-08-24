@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunrise Dental Clinic - Staff Login</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-card">
+
+        <div class="brand-header">
+            <div class="logo-icon">🦷</div>
+            <h2>Sunrise Dental Clinic</h2>
+            <p>Internal Staff Portal Login</p>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+
+            <div class="form-group">
+                <label for="role">Select Role</label>
+                <select id="role" required>
+                    <option value="receptionist">Receptionist</option>
+                    <option value="admin">System Administrator</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn-login">Login to Portal</button>
+        </form>
+
+        <div class="login-footer">
+            <p>Need access? Contact IT Administrator</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function handleLogin(event) {
+        event.preventDefault();
+
+        const role = document.getElementById('role').value;
+
+        // Backend එක connect කරනකම් Demo Navigation එක
+        if (role === 'receptionist') {
+            window.location.href = 'receptionist/dashboard.html';
+        } else if (role === 'admin') {
+            window.location.href = 'admin/dashboard.html';
+        }
+    }
+</script>
+
+</body>
+</html>
