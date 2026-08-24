@@ -1,49 +1,117 @@
 package com.sunrisedental.model;
 
-public class Bill {
-    private String billId;
-    private String appointmentNumber;
-    private String patientName;
+import java.io.Serializable;
+
+public class Bill implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // Database Primary & Foreign Key Fields
+    private int billId;
+    private String billNumber;
+    private int appointmentId;
     private double consultationFee;
     private double treatmentCost;
     private double totalAmount;
-    private String paymentStatus; // e.g., "PAID", "PENDING"
     private String billDate;
 
-    public Bill() {}
+    // Optional Display Fields (UI/JSP Table එකේ JOIN Queries හරහා විස්තර පෙන්වීමට)
+    private String appointmentCode;
+    private String patientName;
 
-    public Bill(String billId, String appointmentNumber, String patientName, double consultationFee, double treatmentCost, double totalAmount, String paymentStatus, String billDate) {
-        this.billId = billId;
-        this.appointmentNumber = appointmentNumber;
-        this.patientName = patientName;
+    // Default Constructor
+    public Bill() {
+    }
+
+    // Constructor for DB Insert (ID & Date නැතුව - DB එකෙන් Auto-generate වන නිසා)
+    public Bill(String billNumber, int appointmentId, double consultationFee, double treatmentCost, double totalAmount) {
+        this.billNumber = billNumber;
+        this.appointmentId = appointmentId;
         this.consultationFee = consultationFee;
         this.treatmentCost = treatmentCost;
         this.totalAmount = totalAmount;
-        this.paymentStatus = paymentStatus;
+    }
+
+    // Full Constructor (DB එකෙන් Data Read කරද්දී පාවිච්චි කිරීමට)
+    public Bill(int billId, String billNumber, int appointmentId, double consultationFee, double treatmentCost, double totalAmount, String billDate) {
+        this.billId = billId;
+        this.billNumber = billNumber;
+        this.appointmentId = appointmentId;
+        this.consultationFee = consultationFee;
+        this.treatmentCost = treatmentCost;
+        this.totalAmount = totalAmount;
         this.billDate = billDate;
     }
 
-    public String getBillId() { return billId; }
-    public void setBillId(String billId) { this.billId = billId; }
+    // Getters and Setters
+    public int getBillId() {
+        return billId;
+    }
 
-    public String getAppointmentNumber() { return appointmentNumber; }
-    public void setAppointmentNumber(String appointmentNumber) { this.appointmentNumber = appointmentNumber; }
+    public void setBillId(int billId) {
+        this.billId = billId;
+    }
 
-    public String getPatientName() { return patientName; }
-    public void setPatientName(String patientName) { this.patientName = patientName; }
+    public String getBillNumber() {
+        return billNumber;
+    }
 
-    public double getConsultationFee() { return consultationFee; }
-    public void setConsultationFee(double consultationFee) { this.consultationFee = consultationFee; }
+    public void setBillNumber(String billNumber) {
+        this.billNumber = billNumber;
+    }
 
-    public double getTreatmentCost() { return treatmentCost; }
-    public void setTreatmentCost(double treatmentCost) { this.treatmentCost = treatmentCost; }
+    public int getAppointmentId() {
+        return appointmentId;
+    }
 
-    public double getTotalAmount() { return totalAmount; }
-    public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
+    public void setAppointmentId(int appointmentId) {
+        this.appointmentId = appointmentId;
+    }
 
-    public String getPaymentStatus() { return paymentStatus; }
-    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+    public double getConsultationFee() {
+        return consultationFee;
+    }
 
-    public String getBillDate() { return billDate; }
-    public void setBillDate(String billDate) { this.billDate = billDate; }
+    public void setConsultationFee(double consultationFee) {
+        this.consultationFee = consultationFee;
+    }
+
+    public double getTreatmentCost() {
+        return treatmentCost;
+    }
+
+    public void setTreatmentCost(double treatmentCost) {
+        this.treatmentCost = treatmentCost;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getBillDate() {
+        return billDate;
+    }
+
+    public void setBillDate(String billDate) {
+        this.billDate = billDate;
+    }
+
+    public String getAppointmentCode() {
+        return appointmentCode;
+    }
+
+    public void setAppointmentCode(String appointmentCode) {
+        this.appointmentCode = appointmentCode;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
 }

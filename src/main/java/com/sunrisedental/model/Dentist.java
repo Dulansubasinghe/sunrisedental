@@ -1,34 +1,98 @@
 package com.sunrisedental.model;
 
-public class Dentist {
-    private String dentistId;
+import java.io.Serializable;
+
+public class Dentist implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // Database Primary Key & Attributes
+    private int dentistId;
+    private String dentistCode;
     private String name;
     private String specialization;
+    private double consultationFee;
     private String contactNumber;
-    private String email;
+    private String status;
 
-    public Dentist() {}
-
-    public Dentist(String dentistId, String name, String specialization, String contactNumber, String email) {
-        this.dentistId = dentistId;
-        this.name = name;
-        this.specialization = specialization;
-        this.contactNumber = contactNumber;
-        this.email = email;
+    // Default Constructor
+    public Dentist() {
     }
 
-    public String getDentistId() { return dentistId; }
-    public void setDentistId(String dentistId) { this.dentistId = dentistId; }
+    // Constructor for DB Insert (ID නැතුව - Auto Increment වන නිසා)
+    public Dentist(String dentistCode, String name, String specialization, double consultationFee, String contactNumber, String status) {
+        this.dentistCode = dentistCode;
+        this.name = name;
+        this.specialization = specialization;
+        this.consultationFee = consultationFee;
+        this.contactNumber = contactNumber;
+        this.status = status;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    // Full Constructor (DB එකෙන් Data Read කරද්දී පාවිච්චි කිරීමට)
+    public Dentist(int dentistId, String dentistCode, String name, String specialization, double consultationFee, String contactNumber, String status) {
+        this.dentistId = dentistId;
+        this.dentistCode = dentistCode;
+        this.name = name;
+        this.specialization = specialization;
+        this.consultationFee = consultationFee;
+        this.contactNumber = contactNumber;
+        this.status = status;
+    }
 
-    public String getSpecialization() { return specialization; }
-    public void setSpecialization(String specialization) { this.specialization = specialization; }
+    // Getters and Setters
+    public int getDentistId() {
+        return dentistId;
+    }
 
-    public String getContactNumber() { return contactNumber; }
-    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+    public void setDentistId(int dentistId) {
+        this.dentistId = dentistId;
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getDentistCode() {
+        return dentistCode;
+    }
+
+    public void setDentistCode(String dentistCode) {
+        this.dentistCode = dentistCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSpecialization() {
+        return specialization;
+    }
+
+    public void setSpecialization(String specialization) {
+        this.specialization = specialization;
+    }
+
+    public double getConsultationFee() {
+        return consultationFee;
+    }
+
+    public void setConsultationFee(double consultationFee) {
+        this.consultationFee = consultationFee;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

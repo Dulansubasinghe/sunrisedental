@@ -5,111 +5,60 @@ import java.io.Serializable;
 public class Appointment implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String appointmentNumber;
-    private String patientName;
-    private String address;
-    private String contactNumber;
-    private String dentistName;
-    private String treatmentType;
-    private double consultationFee;
-    private double treatmentCost;
-    private double totalBill;
+    // Database Table Primary & Foreign Key Fields
+    private int appointmentId;
+    private String appointmentCode;
     private String appointmentDate;
-    private String appointmentTime;
+    private int patientId;
+    private int dentistId;
+    private int treatmentId;
+    private String status;
+
+    // Optional Display Fields (JOIN Queries හරහා UI/JSP Table එකේ නම් පෙන්නීමට)
+    private String patientName;
+    private String dentistName;
+    private String treatmentName;
 
     // Default Constructor
     public Appointment() {
     }
 
-    // Constructor with parameters
-    public Appointment(String appointmentNumber, String patientName, String address,
-                       String contactNumber, String dentistName, String treatmentType,
-                       double consultationFee, double treatmentCost, double totalBill,
-                       String appointmentDate, String appointmentTime) {
-        this.appointmentNumber = appointmentNumber;
-        this.patientName = patientName;
-        this.address = address;
-        this.contactNumber = contactNumber;
-        this.dentistName = dentistName;
-        this.treatmentType = treatmentType;
-        this.consultationFee = consultationFee;
-        this.treatmentCost = treatmentCost;
-        this.totalBill = totalBill;
+    // Constructor for DB Insert (ID නැතුව)
+    public Appointment(String appointmentCode, String appointmentDate, int patientId, int dentistId, int treatmentId, String status) {
+        this.appointmentCode = appointmentCode;
         this.appointmentDate = appointmentDate;
-        this.appointmentTime = appointmentTime;
+        this.patientId = patientId;
+        this.dentistId = dentistId;
+        this.treatmentId = treatmentId;
+        this.status = status;
+    }
+
+    // Full Constructor (Primary Key සහිතව)
+    public Appointment(int appointmentId, String appointmentCode, String appointmentDate, int patientId, int dentistId, int treatmentId, String status) {
+        this.appointmentId = appointmentId;
+        this.appointmentCode = appointmentCode;
+        this.appointmentDate = appointmentDate;
+        this.patientId = patientId;
+        this.dentistId = dentistId;
+        this.treatmentId = treatmentId;
+        this.status = status;
     }
 
     // Getters and Setters
-    public String getAppointmentNumber() {
-        return appointmentNumber;
+    public int getAppointmentId() {
+        return appointmentId;
     }
 
-    public void setAppointmentNumber(String appointmentNumber) {
-        this.appointmentNumber = appointmentNumber;
+    public void setAppointmentId(int appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
-    public String getPatientName() {
-        return patientName;
+    public String getAppointmentCode() {
+        return appointmentCode;
     }
 
-    public void setPatientName(String patientName) {
-        this.patientName = patientName;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-
-    public String getDentistName() {
-        return dentistName;
-    }
-
-    public void setDentistName(String dentistName) {
-        this.dentistName = dentistName;
-    }
-
-    public String getTreatmentType() {
-        return treatmentType;
-    }
-
-    public void setTreatmentType(String treatmentType) {
-        this.treatmentType = treatmentType;
-    }
-
-    public double getConsultationFee() {
-        return consultationFee;
-    }
-
-    public void setConsultationFee(double consultationFee) {
-        this.consultationFee = consultationFee;
-    }
-
-    public double getTreatmentCost() {
-        return treatmentCost;
-    }
-
-    public void setTreatmentCost(double treatmentCost) {
-        this.treatmentCost = treatmentCost;
-    }
-
-    public double getTotalBill() {
-        return totalBill;
-    }
-
-    public void setTotalBill(double totalBill) {
-        this.totalBill = totalBill;
+    public void setAppointmentCode(String appointmentCode) {
+        this.appointmentCode = appointmentCode;
     }
 
     public String getAppointmentDate() {
@@ -120,11 +69,59 @@ public class Appointment implements Serializable {
         this.appointmentDate = appointmentDate;
     }
 
-    public String getAppointmentTime() {
-        return appointmentTime;
+    public int getPatientId() {
+        return patientId;
     }
 
-    public void setAppointmentTime(String appointmentTime) {
-        this.appointmentTime = appointmentTime;
+    public void setPatientId(int patientId) {
+        this.patientId = patientId;
+    }
+
+    public int getDentistId() {
+        return dentistId;
+    }
+
+    public void setDentistId(int dentistId) {
+        this.dentistId = dentistId;
+    }
+
+    public int getTreatmentId() {
+        return treatmentId;
+    }
+
+    public void setTreatmentId(int treatmentId) {
+        this.treatmentId = treatmentId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public String getDentistName() {
+        return dentistName;
+    }
+
+    public void setDentistName(String dentistName) {
+        this.dentistName = dentistName;
+    }
+
+    public String getTreatmentName() {
+        return treatmentName;
+    }
+
+    public void setTreatmentName(String treatmentName) {
+        this.treatmentName = treatmentName;
     }
 }
