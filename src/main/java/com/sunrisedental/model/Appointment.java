@@ -14,7 +14,7 @@ public class Appointment implements Serializable {
     private int treatmentId;
     private String status;
 
-    // Optional Display Fields (JOIN Queries හරහා UI/JSP Table එකේ නම් පෙන්නීමට)
+    // Optional Display Fields
     private String patientName;
     private String dentistName;
     private String treatmentName;
@@ -23,7 +23,7 @@ public class Appointment implements Serializable {
     public Appointment() {
     }
 
-    // Constructor for DB Insert (ID නැතුව)
+    // Constructor for DB Insert
     public Appointment(String appointmentCode, String appointmentDate, int patientId, int dentistId, int treatmentId, String status) {
         this.appointmentCode = appointmentCode;
         this.appointmentDate = appointmentDate;
@@ -33,7 +33,7 @@ public class Appointment implements Serializable {
         this.status = status;
     }
 
-    // Full Constructor (Primary Key සහිතව)
+    // Full Constructor
     public Appointment(int appointmentId, String appointmentCode, String appointmentDate, int patientId, int dentistId, int treatmentId, String status) {
         this.appointmentId = appointmentId;
         this.appointmentCode = appointmentCode;

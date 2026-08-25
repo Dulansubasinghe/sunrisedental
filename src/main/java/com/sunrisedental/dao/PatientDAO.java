@@ -12,75 +12,119 @@ import java.util.List;
 
 public class PatientDAO {
 
-    // 1. Register Patient
+    // Register New Patient
     public boolean addPatient(Patient patient) {
-        String sql = "INSERT INTO patients (patient_id, name, age, gender, contact_number, address, medical_history) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO patients (patient_code, name, contact_number, address) VALUES (?, ?, ?, ?)";
+
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, patient.getPatientId());
+            stmt.setString(1, patient.getPatientCode());
             stmt.setString(2, patient.getName());
-            stmt.setInt(3, patient.getAge());
-            stmt.setString(4, patient.getGender());
-            stmt.setString(5, patient.getContactNumber());
-            stmt.setString(6, patient.getAddress());
-            stmt.setString(7, patient.getMedicalHistory());
+            stmt.setString(3, patient.getContactNumber());
+            stmt.setString(4, patient.getAddress());
 
             return stmt.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // 2. Search Patient
-    public Patient getPatientById(String patientId) {
+    // Search Patient by patient_id
+    public Patient getPatientById(int patientId) {
         String sql = "SELECT * FROM patients WHERE patient_id = ?";
         Patient patient = null;
+
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, patientId);
+            stmt.setInt(1, patientId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                patient = new Patient();
-                patient.setPatientId(rs.getString("patient_id"));
-                patient.setName(rs.getString("name"));
-                patient.setAge(rs.getInt("age"));
-                patient.setGender(rs.getString("gender"));
-                patient.setContactNumber(rs.getString("contact_number"));
-                patient.setAddress(rs.getString("address"));
-                patient.setMedicalHistory(rs.getString("medical_history"));
+                patient = mapResultSetToPatient(rs);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return patient;
     }
 
-    // 3. Get All Patients
+    // Search Patient by Code
+    public Patient getPatientByCode(String patientCode) {
+        String sql = "SELECT * FROM patients WHERE patient_code = ?";
+        Patient patient = null;
+
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, patientCode);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                patient = mapResultSetToPatient(rs);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return patient;
+    }
+
+    // Get All Patients
     public List<Patient> getAllPatients() {
         List<Patient> list = new ArrayList<>();
-        String sql = "SELECT * FROM patients";
+        String sql = "SELECT * FROM patients ORDER BY name ASC";
+
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Patient p = new Patient();
-                p.setPatientId(rs.getString("patient_id"));
-                p.setName(rs.getString("name"));
-                p.setAge(rs.getInt("age"));
-                p.setGender(rs.getString("gender"));
-                p.setContactNumber(rs.getString("contact_number"));
-                p.setAddress(rs.getString("address"));
-                p.setMedicalHistory(rs.getString("medical_history"));
-                list.add(p);
+                list.add(mapResultSetToPatient(rs));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
+    }
+
+    // Update Patient Details
+    public boolean updatePatient(Patient patient) {
+        String sql = "UPDATE patients SET patient_code = ?, name = ?, contact_number = ?, address = ? WHERE patient_id = ?";
+
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, patient.getPatientCode());
+            stmt.setString(2, patient.getName());
+            stmt.setString(3, patient.getContactNumber());
+            stmt.setString(4, patient.getAddress());
+            stmt.setInt(5, patient.getPatientId());
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Map ResultSet row to Patient Model
+    private Patient mapResultSetToPatient(ResultSet rs) throws SQLException {
+        Patient patient = new Patient();
+        patient.setPatientId(rs.getInt("patient_id"));
+        patient.setPatientCode(rs.getString("patient_code"));
+        patient.setName(rs.getString("name"));
+        patient.setContactNumber(rs.getString("contact_number"));
+        patient.setAddress(rs.getString("address"));
+        return patient;
     }
 }

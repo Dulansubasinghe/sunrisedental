@@ -27,7 +27,7 @@ public class AppointmentServlet extends HttpServlet {
         gson = new Gson();
     }
 
-    // 1.Search Appointment
+    // Get all Appointment by Code
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,10 +36,14 @@ public class AppointmentServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        String appointmentNumber = request.getParameter("appointmentNumber");
+        String appointmentCode = request.getParameter("appointmentCode");
+        // Keep support for old appointmentNumber query
+        if (appointmentCode == null || appointmentCode.trim().isEmpty()) {
+            appointmentCode = request.getParameter("appointmentNumber");
+        }
 
-        if (appointmentNumber != null && !appointmentNumber.trim().isEmpty()) {
-            Appointment appointment = appointmentDAO.getAppointmentByNumber(appointmentNumber);
+        if (appointmentCode != null && !appointmentCode.trim().isEmpty()) {
+            Appointment appointment = appointmentDAO.getAppointmentByCode(appointmentCode);
             out.print(gson.toJson(appointment));
         } else {
             List<Appointment> list = appointmentDAO.getAllAppointments();
@@ -48,7 +52,7 @@ public class AppointmentServlet extends HttpServlet {
         out.flush();
     }
 
-    // 2. New Appointment Save
+    // Save New Appointment
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -69,6 +73,41 @@ public class AppointmentServlet extends HttpServlet {
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"status\":\"error\", \"message\":\"Failed to save appointment.\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"status\":\"error\", \"message\":\"Server error: " + e.getMessage() + "\"}");
+        }
+        out.flush();
+    }
+
+    // Update Appointment Status
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        try {
+            BufferedReader reader = request.getReader();
+            Appointment appointment = gson.fromJson(reader, Appointment.class);
+
+            if (appointment != null && appointment.getAppointmentId() > 0 && appointment.getStatus() != null) {
+                boolean isSuccess = appointmentDAO.updateStatus(appointment.getAppointmentId(), appointment.getStatus());
+
+                if (isSuccess) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.print("{\"status\":\"success\", \"message\":\"Appointment status updated successfully!\"}");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"status\":\"error\", \"message\":\"Failed to update appointment status.\"}");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid data provided.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();

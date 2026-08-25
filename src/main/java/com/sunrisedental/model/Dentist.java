@@ -18,7 +18,7 @@ public class Dentist implements Serializable {
     public Dentist() {
     }
 
-    // Constructor for DB Insert (ID නැතුව - Auto Increment වන නිසා)
+    // Constructor for DB Insert
     public Dentist(String dentistCode, String name, String specialization, double consultationFee, String contactNumber, String status) {
         this.dentistCode = dentistCode;
         this.name = name;
@@ -28,7 +28,7 @@ public class Dentist implements Serializable {
         this.status = status;
     }
 
-    // Full Constructor (DB එකෙන් Data Read කරද්දී පාවිච්චි කිරීමට)
+    // Full Constructor
     public Dentist(int dentistId, String dentistCode, String name, String specialization, double consultationFee, String contactNumber, String status) {
         this.dentistId = dentistId;
         this.dentistCode = dentistCode;

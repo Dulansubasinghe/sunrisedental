@@ -14,7 +14,7 @@ public class Bill implements Serializable {
     private double totalAmount;
     private String billDate;
 
-    // Optional Display Fields (UI/JSP Table එකේ JOIN Queries හරහා විස්තර පෙන්වීමට)
+    // Optional Display Fields
     private String appointmentCode;
     private String patientName;
 
@@ -22,7 +22,7 @@ public class Bill implements Serializable {
     public Bill() {
     }
 
-    // Constructor for DB Insert (ID & Date නැතුව - DB එකෙන් Auto-generate වන නිසා)
+    // Constructor for DB Insert
     public Bill(String billNumber, int appointmentId, double consultationFee, double treatmentCost, double totalAmount) {
         this.billNumber = billNumber;
         this.appointmentId = appointmentId;
@@ -31,7 +31,7 @@ public class Bill implements Serializable {
         this.totalAmount = totalAmount;
     }
 
-    // Full Constructor (DB එකෙන් Data Read කරද්දී පාවිච්චි කිරීමට)
+    // Full Constructor
     public Bill(int billId, String billNumber, int appointmentId, double consultationFee, double treatmentCost, double totalAmount, String billDate) {
         this.billId = billId;
         this.billNumber = billNumber;

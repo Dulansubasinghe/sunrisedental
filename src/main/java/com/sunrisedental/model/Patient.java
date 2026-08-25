@@ -1,44 +1,76 @@
 package com.sunrisedental.model;
 
-public class Patient {
-    private String patientId;
+import java.io.Serializable;
+
+public class Patient implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    // DB Table Columns
+    private int patientId;
+    private String patientCode;
     private String name;
-    private int age;
-    private String gender;
     private String contactNumber;
     private String address;
-    private String medicalHistory;
 
-    public Patient() {}
-
-    public Patient(String patientId, String name, int age, String gender, String contactNumber, String address, String medicalHistory) {
-        this.patientId = patientId;
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-        this.contactNumber = contactNumber;
-        this.address = address;
-        this.medicalHistory = medicalHistory;
+    // Default Constructor
+    public Patient() {
     }
 
-    public String getPatientId() { return patientId; }
-    public void setPatientId(String patientId) { this.patientId = patientId; }
+    // Constructor for DB Insert
+    public Patient(String patientCode, String name, String contactNumber, String address) {
+        this.patientCode = patientCode;
+        this.name = name;
+        this.contactNumber = contactNumber;
+        this.address = address;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    // Full Constructor
+    public Patient(int patientId, String patientCode, String name, String contactNumber, String address) {
+        this.patientId = patientId;
+        this.patientCode = patientCode;
+        this.name = name;
+        this.contactNumber = contactNumber;
+        this.address = address;
+    }
 
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
+    // Getters and Setters
+    public int getPatientId() {
+        return patientId;
+    }
 
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
+    public void setPatientId(int patientId) {
+        this.patientId = patientId;
+    }
 
-    public String getContactNumber() { return contactNumber; }
-    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+    public String getPatientCode() {
+        return patientCode;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public void setPatientCode(String patientCode) {
+        this.patientCode = patientCode;
+    }
 
-    public String getMedicalHistory() { return medicalHistory; }
-    public void setMedicalHistory(String medicalHistory) { this.medicalHistory = medicalHistory; }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

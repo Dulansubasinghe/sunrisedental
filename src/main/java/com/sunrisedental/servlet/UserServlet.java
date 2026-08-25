@@ -17,68 +17,118 @@ import java.util.List;
 
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private UserDAO userDAO;
+    private Gson gson;
 
-    private UserDAO userDAO = new UserDAO();
-    private Gson gson = new Gson();
-
-    // Load receptionist data for admin
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        List<User> userList = userDAO.getAllUsers();
-        String jsonResponse = gson.toJson(userList);
-
-        PrintWriter out = resp.getWriter();
-        out.print(jsonResponse);
-        out.flush();
+    public void init() {
+        userDAO = new UserDAO();
+        gson = new Gson();
     }
 
-    // Add receptionist to system
+    // Get Single User by ID
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        BufferedReader reader = req.getReader();
-        User newUser = gson.fromJson(reader, User.class);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
-        boolean isSuccess = userDAO.addUser(newUser);
+        String userIdParam = request.getParameter("userId");
+        if (userIdParam == null || userIdParam.trim().isEmpty()) {
+            userIdParam = request.getParameter("id"); // Parameter Name Compatibility
+        }
 
-        PrintWriter out = resp.getWriter();
-        if (isSuccess) {
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-            out.print("{\"message\": \"User created successfully\"}");
+        if (userIdParam != null && !userIdParam.trim().isEmpty()) {
+            try {
+                int userId = Integer.parseInt(userIdParam);
+                User user = userDAO.getUserById(userId);
+
+                if (user != null) {
+                    user.setPassword(null);
+                }
+                out.print(gson.toJson(user));
+
+            } catch (NumberFormatException e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid User ID format.\"}");
+            }
         } else {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"message\": \"Failed to create user\"}");
+            List<User> list = userDAO.getAllUsers();
+            // All Users Passwords Hide
+            for (User u : list) {
+                u.setPassword(null);
+            }
+            out.print(gson.toJson(list));
         }
         out.flush();
     }
 
-    // Delete user account
+    // Register New User
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        String idParam = req.getParameter("id");
-        PrintWriter out = resp.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
 
-        if (idParam != null) {
-            int userId = Integer.parseInt(idParam);
-            boolean isSuccess = userDAO.deleteUser(userId);
+        try {
+            BufferedReader reader = request.getReader();
+            User newUser = gson.fromJson(reader, User.class);
+
+            boolean isSuccess = userDAO.addUser(newUser);
 
             if (isSuccess) {
-                out.print("{\"message\": \"User deleted successfully\"}");
+                response.setStatus(HttpServletResponse.SC_CREATED);
+                out.print("{\"status\":\"success\", \"message\":\"User account created successfully!\"}");
             } else {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"message\": \"Failed to delete user\"}");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Failed to create user account.\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"status\":\"error\", \"message\":\"Server error: " + e.getMessage() + "\"}");
+        }
+        out.flush();
+    }
+
+    // Delete User Account
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        String idParam = request.getParameter("id");
+        if (idParam == null || idParam.trim().isEmpty()) {
+            idParam = request.getParameter("userId");
+        }
+
+        if (idParam != null && !idParam.trim().isEmpty()) {
+            try {
+                int userId = Integer.parseInt(idParam);
+                boolean isSuccess = userDAO.deleteUser(userId);
+
+                if (isSuccess) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.print("{\"status\":\"success\", \"message\":\"User deleted successfully!\"}");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"status\":\"error\", \"message\":\"Failed to delete user.\"}");
+                }
+            } catch (NumberFormatException e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid User ID format.\"}");
             }
         } else {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"message\": \"User ID is required\"}");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"status\":\"error\", \"message\":\"User ID is required.\"}");
         }
         out.flush();
     }

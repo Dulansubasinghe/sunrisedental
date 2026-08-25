@@ -12,78 +12,125 @@ import java.util.List;
 
 public class BillDAO {
 
-    // 1. Create New Bill
+    // Create New Bill
     public boolean addBill(Bill bill) {
-        String sql = "INSERT INTO bills (bill_id, appointment_number, patient_name, consultation_fee, treatment_cost, total_amount, payment_status, bill_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO bills (bill_number, appointment_id, consultation_fee, treatment_cost, total_amount) " +
+                "VALUES (?, ?, ?, ?, ?)";
+
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, bill.getBillId());
-            stmt.setString(2, bill.getAppointmentNumber());
-            stmt.setString(3, bill.getPatientName());
-            stmt.setDouble(4, bill.getConsultationFee());
-            stmt.setDouble(5, bill.getTreatmentCost());
-            stmt.setDouble(6, bill.getTotalAmount());
-            stmt.setString(7, bill.getPaymentStatus());
-            stmt.setString(8, bill.getBillDate());
+            stmt.setString(1, bill.getBillNumber());
+            stmt.setInt(2, bill.getAppointmentId());
+            stmt.setDouble(3, bill.getConsultationFee());
+            stmt.setDouble(4, bill.getTreatmentCost());
+            stmt.setDouble(5, bill.getTotalAmount());
 
             return stmt.executeUpdate() > 0;
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // 2. Search Bill
-    public Bill getBillById(String billId) {
-        String sql = "SELECT * FROM bills WHERE bill_id = ?";
+    // Search Bill by bill_id
+    public Bill getBillById(int billId) {
+        String sql = "SELECT b.*, a.appointment_code, p.name AS patient_name " +
+                "FROM bills b " +
+                "LEFT JOIN appointments a ON b.appointment_id = a.appointment_id " +
+                "LEFT JOIN patients p ON a.patient_id = p.patient_id " +
+                "WHERE b.bill_id = ?";
+
         Bill bill = null;
+
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, billId);
+            stmt.setInt(1, billId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                bill = new Bill();
-                bill.setBillId(rs.getString("bill_id"));
-                bill.setAppointmentNumber(rs.getString("appointment_number"));
-                bill.setPatientName(rs.getString("patient_name"));
-                bill.setConsultationFee(rs.getDouble("consultation_fee"));
-                bill.setTreatmentCost(rs.getDouble("treatment_cost"));
-                bill.setTotalAmount(rs.getDouble("total_amount"));
-                bill.setPaymentStatus(rs.getString("payment_status"));
-                bill.setBillDate(rs.getString("bill_date"));
+                bill = mapResultSetToBill(rs);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return bill;
     }
 
-    // 3. Get All Bills
+    // Search Bill by Bill Number
+    public Bill getBillByNumber(String billNumber) {
+        String sql = "SELECT b.*, a.appointment_code, p.name AS patient_name " +
+                "FROM bills b " +
+                "LEFT JOIN appointments a ON b.appointment_id = a.appointment_id " +
+                "LEFT JOIN patients p ON a.patient_id = p.patient_id " +
+                "WHERE b.bill_number = ?";
+
+        Bill bill = null;
+
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, billNumber);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                bill = mapResultSetToBill(rs);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return bill;
+    }
+
+    // Get All Bills with Joined Patient Name and Appointment Code
     public List<Bill> getAllBills() {
         List<Bill> list = new ArrayList<>();
-        String sql = "SELECT * FROM bills ORDER BY bill_date DESC";
+        String sql = "SELECT b.*, a.appointment_code, p.name AS patient_name " +
+                "FROM bills b " +
+                "LEFT JOIN appointments a ON b.appointment_id = a.appointment_id " +
+                "LEFT JOIN patients p ON a.patient_id = p.patient_id " +
+                "ORDER BY b.bill_date DESC";
+
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Bill b = new Bill();
-                b.setBillId(rs.getString("bill_id"));
-                b.setAppointmentNumber(rs.getString("appointment_number"));
-                b.setPatientName(rs.getString("patient_name"));
-                b.setConsultationFee(rs.getDouble("consultation_fee"));
-                b.setTreatmentCost(rs.getDouble("treatment_cost"));
-                b.setTotalAmount(rs.getDouble("total_amount"));
-                b.setPaymentStatus(rs.getString("payment_status"));
-                b.setBillDate(rs.getString("bill_date"));
-                list.add(b);
+                list.add(mapResultSetToBill(rs));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return list;
+    }
+
+    // Map ResultSet row to Bill Object
+    private Bill mapResultSetToBill(ResultSet rs) throws SQLException {
+        Bill bill = new Bill();
+        bill.setBillId(rs.getInt("bill_id"));
+        bill.setBillNumber(rs.getString("bill_number"));
+        bill.setAppointmentId(rs.getInt("appointment_id"));
+        bill.setConsultationFee(rs.getDouble("consultation_fee"));
+        bill.setTreatmentCost(rs.getDouble("treatment_cost"));
+        bill.setTotalAmount(rs.getDouble("total_amount"));
+        bill.setBillDate(rs.getString("bill_date"));
+
+        // Optional Joined Display Fields
+        try {
+            bill.setAppointmentCode(rs.getString("appointment_code"));
+            bill.setPatientName(rs.getString("patient_name"));
+        } catch (SQLException ignored) {
+            // Skip execution if query has no join
+        }
+
+        return bill;
     }
 }

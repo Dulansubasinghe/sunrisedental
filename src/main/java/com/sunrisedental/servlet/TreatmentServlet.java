@@ -1,8 +1,8 @@
 package com.sunrisedental.servlet;
 
 import com.google.gson.Gson;
-import com.sunrisedental.dao.BillDAO;
-import com.sunrisedental.model.Bill;
+import com.sunrisedental.dao.TreatmentDAO;
+import com.sunrisedental.model.Treatment;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,19 +15,19 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-@WebServlet("/bill")
-public class BillServlet extends HttpServlet {
+@WebServlet("/treatment")
+public class TreatmentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private BillDAO billDAO;
+    private TreatmentDAO treatmentDAO;
     private Gson gson;
 
     @Override
     public void init() {
-        billDAO = new BillDAO();
+        treatmentDAO = new TreatmentDAO();
         gson = new Gson();
     }
 
-    // 1. Search Bill by Bill Number / Bill ID OR Get All Bills
+    // 1. Get All Treatments or Search by ID / Treatment Code
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,34 +36,31 @@ public class BillServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        String billNumber = request.getParameter("billNumber");
-        String billIdParam = request.getParameter("billId");
+        String treatmentCode = request.getParameter("treatmentCode");
+        String idParam = request.getParameter("id");
 
-        if (billNumber != null && !billNumber.trim().isEmpty()) {
-            // Search by Bill Number (උදා: BILL-1001)
-            Bill bill = billDAO.getBillByNumber(billNumber);
-            out.print(gson.toJson(bill));
+        if (treatmentCode != null && !treatmentCode.trim().isEmpty()) {
+            Treatment treatment = treatmentDAO.getTreatmentByCode(treatmentCode);
+            out.print(gson.toJson(treatment));
 
-        } else if (billIdParam != null && !billIdParam.trim().isEmpty()) {
-            // Search by Primary Key Bill ID
+        } else if (idParam != null && !idParam.trim().isEmpty()) {
             try {
-                int billId = Integer.parseInt(billIdParam);
-                Bill bill = billDAO.getBillById(billId);
-                out.print(gson.toJson(bill));
+                int id = Integer.parseInt(idParam);
+                Treatment treatment = treatmentDAO.getTreatmentById(id);
+                out.print(gson.toJson(treatment));
             } catch (NumberFormatException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"status\":\"error\", \"message\":\"Invalid Bill ID format.\"}");
+                out.print("{\"status\":\"error\", \"message\":\"Invalid Treatment ID format.\"}");
             }
 
         } else {
-            // Parameter නොමැති විට සියලුම Bills ලබා දේ
-            List<Bill> list = billDAO.getAllBills();
+            List<Treatment> list = treatmentDAO.getAllTreatments();
             out.print(gson.toJson(list));
         }
         out.flush();
     }
 
-    // 2. Create New Bill
+    // 2. Add New Treatment
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -74,16 +71,16 @@ public class BillServlet extends HttpServlet {
 
         try {
             BufferedReader reader = request.getReader();
-            Bill bill = gson.fromJson(reader, Bill.class);
+            Treatment treatment = gson.fromJson(reader, Treatment.class);
 
-            boolean isSuccess = billDAO.addBill(bill);
+            boolean isSuccess = treatmentDAO.addTreatment(treatment);
 
             if (isSuccess) {
                 response.setStatus(HttpServletResponse.SC_CREATED);
-                out.print("{\"status\":\"success\", \"message\":\"Bill created successfully!\"}");
+                out.print("{\"status\":\"success\", \"message\":\"Treatment added successfully!\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"status\":\"error\", \"message\":\"Failed to create bill.\"}");
+                out.print("{\"status\":\"error\", \"message\":\"Failed to add treatment.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();

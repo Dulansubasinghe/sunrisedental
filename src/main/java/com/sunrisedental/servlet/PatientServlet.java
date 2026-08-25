@@ -27,28 +27,47 @@ public class PatientServlet extends HttpServlet {
         gson = new Gson();
     }
 
+    // Search Patient by Code
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        String patientId = request.getParameter("patientId");
+        String patientCode = request.getParameter("patientCode");
+        String patientIdParam = request.getParameter("patientId");
 
-        if (patientId != null && !patientId.trim().isEmpty()) {
-            Patient patient = patientDAO.getPatientById(patientId);
+        if (patientCode != null && !patientCode.trim().isEmpty()) {
+            // Search by Patient Code
+            Patient patient = patientDAO.getPatientByCode(patientCode);
             out.print(gson.toJson(patient));
+
+        } else if (patientIdParam != null && !patientIdParam.trim().isEmpty()) {
+            // Search by Primary Key ID
+            try {
+                int patientId = Integer.parseInt(patientIdParam);
+                Patient patient = patientDAO.getPatientById(patientId);
+                out.print(gson.toJson(patient));
+            } catch (NumberFormatException e) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid Patient ID format.\"}");
+            }
+
         } else {
+            // Return all patients if no param is passed
             List<Patient> list = patientDAO.getAllPatients();
             out.print(gson.toJson(list));
         }
         out.flush();
     }
 
+    // Register New Patient
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
@@ -65,6 +84,41 @@ public class PatientServlet extends HttpServlet {
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"status\":\"error\", \"message\":\"Failed to register patient.\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"status\":\"error\", \"message\":\"Server error: " + e.getMessage() + "\"}");
+        }
+        out.flush();
+    }
+
+    // Update Existing Patient Details
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        try {
+            BufferedReader reader = request.getReader();
+            Patient patient = gson.fromJson(reader, Patient.class);
+
+            if (patient != null && patient.getPatientId() > 0) {
+                boolean isSuccess = patientDAO.updatePatient(patient);
+
+                if (isSuccess) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    out.print("{\"status\":\"success\", \"message\":\"Patient details updated successfully!\"}");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    out.print("{\"status\":\"error\", \"message\":\"Failed to update patient details.\"}");
+                }
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid Patient ID provided.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();
