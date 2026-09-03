@@ -27,7 +27,7 @@ public class DentistServlet extends HttpServlet {
         gson = new Gson();
     }
 
-    // 1. Search Dentist by Code
+    // 1.Search Dentist by Code Get Active List, or Get All
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,16 +36,20 @@ public class DentistServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
+        String action = request.getParameter("action");
         String dentistCode = request.getParameter("dentistCode");
         String dentistIdParam = request.getParameter("dentistId");
 
-        if (dentistCode != null && !dentistCode.trim().isEmpty()) {
-            // Search by Dentist Code
+        // Get all active dentists
+        if ("activeList".equalsIgnoreCase(action)) {
+            List<Dentist> list = dentistDAO.getActiveDentists();
+            out.print(gson.toJson(list));
+
+        } else if (dentistCode != null && !dentistCode.trim().isEmpty()) {
             Dentist dentist = dentistDAO.getDentistByCode(dentistCode);
             out.print(gson.toJson(dentist));
 
         } else if (dentistIdParam != null && !dentistIdParam.trim().isEmpty()) {
-            // Search by Dentist Primary Key ID
             try {
                 int dentistId = Integer.parseInt(dentistIdParam);
                 Dentist dentist = dentistDAO.getDentistById(dentistId);
@@ -56,14 +60,13 @@ public class DentistServlet extends HttpServlet {
             }
 
         } else {
-            // Return all dentists if no filter specified
             List<Dentist> list = dentistDAO.getAllDentists();
             out.print(gson.toJson(list));
         }
         out.flush();
     }
 
-    // Register New Dentist
+    // 2. Register New Dentist
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -93,7 +96,7 @@ public class DentistServlet extends HttpServlet {
         out.flush();
     }
 
-    // Update Dentist Status
+    // 3. Update Dentist Details & Status
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -106,19 +109,19 @@ public class DentistServlet extends HttpServlet {
             BufferedReader reader = request.getReader();
             Dentist dentist = gson.fromJson(reader, Dentist.class);
 
-            if (dentist != null && dentist.getDentistId() > 0 && dentist.getStatus() != null) {
-                boolean isSuccess = dentistDAO.updateStatus(dentist.getDentistId(), dentist.getStatus());
+            if (dentist != null && (dentist.getDentistId() > 0 || (dentist.getDentistCode() != null && !dentist.getDentistCode().trim().isEmpty()))) {
+                boolean isSuccess = dentistDAO.updateDentist(dentist);
 
                 if (isSuccess) {
                     response.setStatus(HttpServletResponse.SC_OK);
-                    out.print("{\"status\":\"success\", \"message\":\"Dentist status updated successfully!\"}");
+                    out.print("{\"status\":\"success\", \"message\":\"Dentist updated successfully!\"}");
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.print("{\"status\":\"error\", \"message\":\"Failed to update dentist status.\"}");
+                    out.print("{\"status\":\"error\", \"message\":\"Failed to update dentist.\"}");
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"status\":\"error\", \"message\":\"Invalid data provided.\"}");
+                out.print("{\"status\":\"error\", \"message\":\"Invalid dentist data provided.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();
