@@ -27,7 +27,7 @@ public class TreatmentServlet extends HttpServlet {
         gson = new Gson();
     }
 
-    // 1. Get All Treatments or Search by ID / Treatment Code
+    // 1.Get All Treatments
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -81,6 +81,36 @@ public class TreatmentServlet extends HttpServlet {
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"status\":\"error\", \"message\":\"Failed to add treatment.\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"status\":\"error\", \"message\":\"Server error: " + e.getMessage() + "\"}");
+        }
+        out.flush();
+    }
+
+    // 3. Update / delete Existing Treatment
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        try {
+            BufferedReader reader = request.getReader();
+            Treatment treatment = gson.fromJson(reader, Treatment.class);
+
+            boolean isSuccess = treatmentDAO.updateTreatment(treatment);
+
+            if (isSuccess) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.print("{\"status\":\"success\", \"message\":\"Treatment updated successfully!\"}");
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Failed to update treatment.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();

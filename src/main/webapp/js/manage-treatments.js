@@ -1,4 +1,46 @@
-let selectedRow = null;
+let selectedTreatmentId = null;
+
+// Load treatments from database on page load
+document.addEventListener("DOMContentLoaded", loadTreatments);
+
+// Get all treatments from DB
+function loadTreatments() {
+    fetch('/sunrisedental_war_exploded/treatment')
+        .then(response => response.json())
+        .then(treatments => {
+            const tableBody = document.getElementById('treatmentTableBody');
+            if (!tableBody) return;
+            tableBody.innerHTML = ''; // clear table
+
+            treatments.forEach(treatment => {
+                const badgeClass = treatment.status === 'Active' ? 'badge active' : 'badge inactive';
+                const feeValue = parseFloat(treatment.standardFee || 0);
+                const formattedFee = feeValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const trtCode = treatment.treatmentCode || treatment.id;
+                const durationText = treatment.durationMins ? `${treatment.durationMins} Mins` : 'N/A';
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><strong>#${trtCode}</strong></td>
+                    <td>${treatment.treatmentName}</td>
+                    <td>LKR ${formattedFee}</td>
+                    <td>${durationText}</td>
+                    <td><span class="${badgeClass}">${treatment.status}</span></td>
+                    <td>
+                        <div class="action-dropdown">
+                            <button class="btn-action">Options ▾</button>
+                            <div class="dropdown-content">
+                                <a href="javascript:void(0)" onclick="openUpdateModal(${treatment.id}, '${trtCode}', '${treatment.treatmentName}', ${feeValue}, '${durationText}', '${treatment.status}')">✏️ Update Details</a>
+                                <a href="javascript:void(0)" class="danger-text" onclick="deleteTreatment(${treatment.id}, '${trtCode}', '${treatment.treatmentName}', ${feeValue}, '${durationText}')">🗑️ Delete (Deactivate)</a>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+            });
+        })
+        .catch(err => console.error("Error loading treatments:", err));
+}
 
 function openAddModal() {
     document.getElementById('addTreatmentForm').reset();
@@ -9,57 +51,51 @@ function closeAddModal() {
     document.getElementById('addModal').style.display = 'none';
 }
 
+// Add new treatment to database
 function handleAddTreatment(event) {
     event.preventDefault();
 
     const id = document.getElementById('addId').value.trim();
     const name = document.getElementById('addName').value.trim();
     const feeInput = parseFloat(document.getElementById('addFee').value);
-    const formattedFee = feeInput.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const duration = document.getElementById('addDuration').value;
     const status = document.getElementById('addStatus').value;
 
-    const tableBody = document.getElementById('treatmentTableBody');
-    const newRow = tableBody.insertRow();
-    const badgeClass = status === 'Active' ? 'badge active' : 'badge inactive';
+    const treatmentData = {
+        treatmentCode: id,
+        treatmentName: name,
+        standardFee: feeInput,
+        durationMins: parseInt(duration),
+        status: status
+    };
 
-    newRow.innerHTML = `
-        <td><strong>#${id}</strong></td>
-        <td>${name}</td>
-        <td>LKR ${formattedFee}</td>
-        <td>${duration}</td>
-        <td><span class="${badgeClass}">${status}</span></td>
-        <td>
-            <div class="action-dropdown">
-                <button class="btn-action">Options ▾</button>
-                <div class="dropdown-content">
-                    <a href="javascript:void(0)" onclick="openUpdateModal(this)">✏️ Update Details</a>
-                    <a href="javascript:void(0)" class="danger-text" onclick="deleteTreatment(this)">🗑️ Delete (Deactivate)</a>
-                </div>
-            </div>
-        </td>
-    `;
-
-    closeAddModal();
-    alert("✅ Treatment #" + id + " Added Successfully!");
+    fetch('/sunrisedental_war_exploded/treatment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(treatmentData)
+    })
+        .then(async response => {
+            const result = await response.json();
+            if (response.ok) {
+                alert("✅ Treatment #" + id + " Added Successfully!");
+                closeAddModal();
+                loadTreatments(); // Reload table with fresh data from MySQL DB
+            } else {
+                alert("❌ Error: " + (result.message || "Failed to save treatment"));
+            }
+        })
+        .catch(err => {
+            console.error("Error adding treatment:", err);
+            alert("❌ Server connection error!");
+        });
 }
 
-function openUpdateModal(element) {
-    selectedRow = element.closest('tr');
+function openUpdateModal(id, code, name, fee, duration, status) {
+    selectedTreatmentId = id;
 
-    const id = selectedRow.cells[0].innerText.replace('#', '').trim();
-    const name = selectedRow.cells[1].innerText.trim();
-
-    // Clean fee text using Regex (removes 'LKR', commas, and extra spaces)
-    const rawFeeText = selectedRow.cells[2].innerText;
-    const cleanFee = rawFeeText.replace(/[^0-9.]/g, '');
-
-    const duration = selectedRow.cells[3].innerText.trim();
-    const status = selectedRow.cells[4].innerText.trim();
-
-    document.getElementById('updateTargetId').value = '#' + id;
+    document.getElementById('updateTargetId').value = '#' + code;
     document.getElementById('updateName').value = name;
-    document.getElementById('updateFee').value = cleanFee ? parseFloat(cleanFee) : '';
+    document.getElementById('updateFee').value = fee;
     document.getElementById('updateDuration').value = duration;
     document.getElementById('updateStatus').value = status;
 
@@ -70,34 +106,73 @@ function closeUpdateModal() {
     document.getElementById('updateModal').style.display = 'none';
 }
 
+// Update existing treatment in database
 function handleUpdateTreatment(event) {
     event.preventDefault();
 
-    if (selectedRow) {
-        const name = document.getElementById('updateName').value.trim();
-        const feeInput = parseFloat(document.getElementById('updateFee').value);
-        const formattedFee = feeInput.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        const duration = document.getElementById('updateDuration').value;
-        const status = document.getElementById('updateStatus').value;
+    if (!selectedTreatmentId) return;
 
-        selectedRow.cells[1].innerText = name;
-        selectedRow.cells[2].innerText = 'LKR ' + formattedFee;
-        selectedRow.cells[3].innerText = duration;
+    const code = document.getElementById('updateTargetId').value.replace('#', '').trim();
+    const name = document.getElementById('updateName').value.trim();
+    const feeInput = parseFloat(document.getElementById('updateFee').value);
+    const duration = document.getElementById('updateDuration').value;
+    const status = document.getElementById('updateStatus').value;
 
-        const badgeClass = status === 'Active' ? 'badge active' : 'badge inactive';
-        selectedRow.cells[4].innerHTML = `<span class="${badgeClass}">${status}</span>`;
+    const updateData = {
+        id: selectedTreatmentId,
+        treatmentCode: code,
+        treatmentName: name,
+        standardFee: feeInput,
+        durationMins: parseInt(duration),
+        status: status
+    };
 
-        closeUpdateModal();
-        alert("✅ Treatment Details Updated Successfully!");
-    }
+    fetch('/sunrisedental_war_exploded/treatment', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+    })
+        .then(async response => {
+            const result = await response.json();
+            if (response.ok) {
+                alert("✅ Treatment Details Updated Successfully!");
+                closeUpdateModal();
+                loadTreatments();
+            } else {
+                alert("❌ Error: " + (result.message || "Failed to update treatment"));
+            }
+        })
+        .catch(err => {
+            console.error("Error updating treatment:", err);
+            alert("❌ Server connection error!");
+        });
 }
 
-function deleteTreatment(element) {
-    const row = element.closest('tr');
-    const trtName = row.cells[1].innerText;
-
+// Deactivate treatment in database
+function deleteTreatment(id, code, trtName, fee, duration) {
     if (confirm("Are you sure you want to set " + trtName + " to Inactive?")) {
-        row.cells[4].innerHTML = `<span class="badge inactive">Inactive</span>`;
-        alert(trtName + " status changed to Inactive!");
+        const updateData = {
+            id: id,
+            treatmentCode: code,
+            treatmentName: trtName,
+            standardFee: fee,
+            durationMins: parseInt(duration),
+            status: "Inactive"
+        };
+
+        fetch('/sunrisedental_war_exploded/treatment', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        })
+            .then(async response => {
+                if (response.ok) {
+                    alert("✅ " + trtName + " status changed to Inactive!");
+                    loadTreatments();
+                } else {
+                    alert("❌ Failed to update treatment status.");
+                }
+            })
+            .catch(err => console.error("Error deactivating treatment:", err));
     }
 }
