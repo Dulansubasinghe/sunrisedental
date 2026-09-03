@@ -27,7 +27,7 @@ public class UserServlet extends HttpServlet {
         gson = new Gson();
     }
 
-    // Get Single User by ID
+    // 1. Get All Users or Search User by ID
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,37 +36,30 @@ public class UserServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        String userIdParam = request.getParameter("userId");
-        if (userIdParam == null || userIdParam.trim().isEmpty()) {
-            userIdParam = request.getParameter("id"); // Parameter Name Compatibility
-        }
+        String idParam = request.getParameter("id");
 
-        if (userIdParam != null && !userIdParam.trim().isEmpty()) {
+        if (idParam != null && !idParam.trim().isEmpty()) {
             try {
-                int userId = Integer.parseInt(userIdParam);
-                User user = userDAO.getUserById(userId);
-
+                int id = Integer.parseInt(idParam);
+                User user = userDAO.getUserById(id);
                 if (user != null) {
-                    user.setPassword(null);
+                    out.print(gson.toJson(user));
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    out.print("{\"status\":\"error\", \"message\":\"User not found.\"}");
                 }
-                out.print(gson.toJson(user));
-
             } catch (NumberFormatException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 out.print("{\"status\":\"error\", \"message\":\"Invalid User ID format.\"}");
             }
         } else {
             List<User> list = userDAO.getAllUsers();
-            // All Users Passwords Hide
-            for (User u : list) {
-                u.setPassword(null);
-            }
             out.print(gson.toJson(list));
         }
         out.flush();
     }
 
-    // Register New User
+    // 2. Create New User with  Validation
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -78,6 +71,23 @@ public class UserServlet extends HttpServlet {
         try {
             BufferedReader reader = request.getReader();
             User newUser = gson.fromJson(reader, User.class);
+
+            String usernameRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z0-9_]{3,20}$";
+            String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@#%!*?&])[A-Za-z\\d$@#%!*?&]{6,}$";
+
+            if (newUser.getUsername() == null || !newUser.getUsername().matches(usernameRegex)) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Username must contain Uppercase, Lowercase, and Number.\"}");
+                out.flush();
+                return;
+            }
+
+            if (newUser.getPassword() == null || !newUser.getPassword().matches(passwordRegex)) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Password must contain Uppercase, Lowercase, Number, and Special character ($@#%!*?&).\"}");
+                out.flush();
+                return;
+            }
 
             boolean isSuccess = userDAO.addUser(newUser);
 
@@ -96,39 +106,49 @@ public class UserServlet extends HttpServlet {
         out.flush();
     }
 
-    // Delete User Account
+    // 3. Update Existing User
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        String idParam = request.getParameter("id");
-        if (idParam == null || idParam.trim().isEmpty()) {
-            idParam = request.getParameter("userId");
-        }
+        try {
+            BufferedReader reader = request.getReader();
+            User userToUpdate = gson.fromJson(reader, User.class);
 
-        if (idParam != null && !idParam.trim().isEmpty()) {
-            try {
-                int userId = Integer.parseInt(idParam);
-                boolean isSuccess = userDAO.deleteUser(userId);
+            String usernameRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z0-9_]{3,20}$";
+            String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@#%!*?&])[A-Za-z\\d$@#%!*?&]{6,}$";
 
-                if (isSuccess) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    out.print("{\"status\":\"success\", \"message\":\"User deleted successfully!\"}");
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    out.print("{\"status\":\"error\", \"message\":\"Failed to delete user.\"}");
-                }
-            } catch (NumberFormatException e) {
+            if (userToUpdate.getUsername() != null && !userToUpdate.getUsername().matches(usernameRegex)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"status\":\"error\", \"message\":\"Invalid User ID format.\"}");
+                out.print("{\"status\":\"error\", \"message\":\"Invalid Username format.\"}");
+                out.flush();
+                return;
             }
-        } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"status\":\"error\", \"message\":\"User ID is required.\"}");
+
+            if (userToUpdate.getPassword() != null && !userToUpdate.getPassword().isEmpty() && !userToUpdate.getPassword().matches(passwordRegex)) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid Password format.\"}");
+                out.flush();
+                return;
+            }
+
+            boolean isSuccess = userDAO.updateUser(userToUpdate);
+
+            if (isSuccess) {
+                response.setStatus(HttpServletResponse.SC_OK);
+                out.print("{\"status\":\"success\", \"message\":\"User updated successfully!\"}");
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Failed to update user.\"}");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"status\":\"error\", \"message\":\"Server error: " + e.getMessage() + "\"}");
         }
         out.flush();
     }

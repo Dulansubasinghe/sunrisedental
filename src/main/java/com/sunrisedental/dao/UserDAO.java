@@ -12,6 +12,19 @@ import java.util.List;
 
 public class UserDAO {
 
+    // Helper Method to Map ResultSet to User Object
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setUserId(rs.getInt("user_id"));
+        user.setUserCode(rs.getString("user_code"));
+        user.setFullName(rs.getString("full_name"));
+        user.setUsername(rs.getString("username"));
+        user.setPassword(rs.getString("password"));
+        user.setRole(rs.getString("role"));
+        user.setStatus(rs.getString("status"));
+        return user;
+    }
+
     // Register New User
     public boolean addUser(User user) {
         String sql = "INSERT INTO users (user_code, full_name, username, password, role, status) VALUES (?, ?, ?, ?, ?, ?)";
@@ -95,36 +108,54 @@ public class UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return userList;
     }
 
-    // Delete Selected User by ID
-    public boolean deleteUser(int id) {
-        String sql = "DELETE FROM users WHERE user_id = ?";
+    // Update Existing User (Username, Password, Status, etc. dynamically)
+    public boolean updateUser(User user) {
+        StringBuilder sql = new StringBuilder("UPDATE users SET ");
+        List<Object> params = new ArrayList<>();
+
+        if (user.getFullName() != null && !user.getFullName().trim().isEmpty()) {
+            sql.append("full_name = ?, ");
+            params.add(user.getFullName());
+        }
+        if (user.getUsername() != null && !user.getUsername().trim().isEmpty()) {
+            sql.append("username = ?, ");
+            params.add(user.getUsername());
+        }
+        if (user.getPassword() != null && !user.getPassword().trim().isEmpty()) {
+            sql.append("password = ?, ");
+            params.add(user.getPassword());
+        }
+        if (user.getRole() != null && !user.getRole().trim().isEmpty()) {
+            sql.append("role = ?, ");
+            params.add(user.getRole());
+        }
+        if (user.getStatus() != null && !user.getStatus().trim().isEmpty()) {
+            sql.append("status = ?, ");
+            params.add(user.getStatus());
+        }
+
+        if (params.isEmpty()) return false;
+
+        // Remove trailing comma
+        sql.setLength(sql.length() - 2);
+        sql.append(" WHERE user_id = ?");
+        params.add(user.getUserId());
 
         try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
 
-            stmt.setInt(1, id);
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-    }
-
-    // Map ResultSet row to User Model Object
-    private User mapResultSetToUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setUserId(rs.getInt("user_id"));
-        user.setUserCode(rs.getString("user_code"));
-        user.setFullName(rs.getString("full_name"));
-        user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password"));
-        user.setRole(rs.getString("role"));
-        user.setStatus(rs.getString("status"));
-        return user;
     }
 }

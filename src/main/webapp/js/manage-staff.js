@@ -1,11 +1,48 @@
-let selectedRow = null;
+let selectedUserId = null;
 
 // Validation Patterns:
-// Username: At least 1 Uppercase, 1 Lowercase, 1 Number
-const usernameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9_]{4,}$/;
-
-// Password: At least 1 Uppercase, 1 Lowercase, 1 Number, 1 Special Char ($@#%!*?&)
+const usernameRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z0-9_]{3,}$/;
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@#%!*?&])[A-Za-z\d$@#%!*?&]{6,}$/;
+
+// Load users from database on page load
+document.addEventListener("DOMContentLoaded", loadUsers);
+
+// 1. Get All Users from Database
+function loadUsers() {
+    fetch('/sunrisedental_war_exploded/user')
+        .then(response => response.json())
+        .then(users => {
+            const tableBody = document.getElementById('staffTableBody');
+            if (!tableBody) return;
+            tableBody.innerHTML = ''; // Table Clear
+
+            users.forEach(user => {
+                const badgeClass = user.status === 'Active' ? 'badge active' : 'badge inactive';
+                const userCodeDisplay = user.userCode ? user.userCode : `S-${user.userId}`;
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><strong>#${userCodeDisplay}</strong></td>
+                    <td>${user.fullName}</td>
+                    <td><span class="role-badge">${user.role}</span></td>
+                    <td>${user.username}</td>
+                    <td><code>${user.password}</code></td>
+                    <td><span class="${badgeClass}">${user.status}</span></td>
+                    <td>
+                        <div class="action-dropdown">
+                            <button class="btn-action">Options ▾</button>
+                            <div class="dropdown-content">
+                                <a href="javascript:void(0)" onclick="openUpdateModal(${user.userId}, '${user.fullName}', '${userCodeDisplay}', '${user.username}', '${user.password}', '${user.status}')">✏️ Update Credentials</a>
+                                <a href="javascript:void(0)" class="danger-text" onclick="deleteUser(${user.userId}, '${user.fullName}')">🗑️ Delete (Deactivate)</a>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(newRow);
+            });
+        })
+        .catch(err => console.error("Error loading users:", err));
+}
 
 function openAddModal() {
     document.getElementById('addUserForm').reset();
@@ -16,6 +53,7 @@ function closeAddModal() {
     document.getElementById('addModal').style.display = 'none';
 }
 
+// 2. Add New User to Database
 function handleAddUser(event) {
     event.preventDefault();
 
@@ -26,54 +64,50 @@ function handleAddUser(event) {
     const password = document.getElementById('addPassword').value.trim();
     const status = document.getElementById('addStatus').value;
 
-    // Username Validation Check
     if (!usernameRegex.test(username)) {
-        alert("❌ Invalid Username!\nUsername must contain:\n- At least one Uppercase letter (A-Z)\n- At least one Lowercase letter (a-z)\n- At least one Number (0-9)");
+        alert("❌ Invalid Username!\nMust contain Uppercase (A-Z), Lowercase (a-z), and Number (0-9).");
         return;
     }
 
-    // Password Validation Check
     if (!passwordRegex.test(password)) {
-        alert("❌ Invalid Password!\nPassword must contain:\n- At least one Uppercase letter (A-Z)\n- At least one Lowercase letter (a-z)\n- At least one Number (0-9)\n- At least one Special character (e.g. $, @, #, %)");
+        alert("❌ Invalid Password!\nMust contain Uppercase, Lowercase, Number, and Special character (e.g. $, @, #).");
         return;
     }
 
-    const tableBody = document.getElementById('staffTableBody');
-    const newRow = tableBody.insertRow();
-    const badgeClass = status === 'Active' ? 'badge active' : 'badge inactive';
+    const userData = {
+        userCode: id,
+        fullName: name,
+        role: role,
+        username: username,
+        password: password,
+        status: status
+    };
 
-    newRow.innerHTML = `
-        <td><strong>#${id}</strong></td>
-        <td>${name}</td>
-        <td><span class="role-badge">${role}</span></td>
-        <td>${username}</td>
-        <td><code>${password}</code></td>
-        <td><span class="${badgeClass}">${status}</span></td>
-        <td>
-            <div class="action-dropdown">
-                <button class="btn-action">Options ▾</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="openUpdateModal(this)">✏️ Update Credentials</a>
-                    <a href="#" class="danger-text" onclick="deleteUser(this)">🗑️ Delete (Deactivate)</a>
-                </div>
-            </div>
-        </td>
-    `;
-
-    closeAddModal();
-    alert("✅ Staff User #" + id + " Created Successfully!");
+    fetch('/sunrisedental_war_exploded/user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    })
+        .then(async response => {
+            const result = await response.json();
+            if (response.ok) {
+                alert("✅ Staff User #" + id + " Created Successfully!");
+                closeAddModal();
+                loadUsers();
+            } else {
+                alert("❌ Error: " + result.message);
+            }
+        })
+        .catch(err => {
+            console.error("Error adding user:", err);
+            alert("❌ Server connection error!");
+        });
 }
 
-function openUpdateModal(element) {
-    selectedRow = element.closest('tr');
+function openUpdateModal(userId, name, userCode, username, password, status) {
+    selectedUserId = userId;
 
-    const id = selectedRow.cells[0].innerText;
-    const name = selectedRow.cells[1].innerText;
-    const username = selectedRow.cells[3].innerText;
-    const password = selectedRow.cells[4].innerText;
-    const status = selectedRow.cells[5].innerText.trim();
-
-    document.getElementById('updateTarget').value = name + ' (' + id + ')';
+    document.getElementById('updateTarget').value = `${name} (#${userCode})`;
     document.getElementById('updateUsername').value = username;
     document.getElementById('updatePassword').value = password;
     document.getElementById('updateStatus').value = status;
@@ -85,43 +119,75 @@ function closeUpdateModal() {
     document.getElementById('updateModal').style.display = 'none';
 }
 
+// 3. Update User in Database
 function handleUpdateUser(event) {
     event.preventDefault();
 
-    if (selectedRow) {
-        const username = document.getElementById('updateUsername').value.trim();
-        const password = document.getElementById('updatePassword').value.trim();
-        const status = document.getElementById('updateStatus').value;
+    if (!selectedUserId) return;
 
-        // Username Validation Check
-        if (!usernameRegex.test(username)) {
-            alert("❌ Invalid Username!\nUsername must contain:\n- At least one Uppercase letter (A-Z)\n- At least one Lowercase letter (a-z)\n- At least one Number (0-9)");
-            return;
-        }
+    const username = document.getElementById('updateUsername').value.trim();
+    const password = document.getElementById('updatePassword').value.trim();
+    const status = document.getElementById('updateStatus').value;
 
-        // Password Validation Check
-        if (!passwordRegex.test(password)) {
-            alert("❌ Invalid Password!\nPassword must contain:\n- At least one Uppercase letter (A-Z)\n- At least one Lowercase letter (a-z)\n- At least one Number (0-9)\n- At least one Special character (e.g. $, @, #, %)");
-            return;
-        }
-
-        selectedRow.cells[3].innerText = username;
-        selectedRow.cells[4].innerHTML = `<code>${password}</code>`;
-
-        const badgeClass = status === 'Active' ? 'badge active' : 'badge inactive';
-        selectedRow.cells[5].innerHTML = `<span class="${badgeClass}">${status}</span>`;
-
-        closeUpdateModal();
-        alert("✅ User Credentials Updated Successfully!");
+    if (!usernameRegex.test(username)) {
+        alert("❌ Invalid Username!\nMust contain Uppercase (A-Z), Lowercase (a-z), and Number (0-9).");
+        return;
     }
+
+    if (!passwordRegex.test(password)) {
+        alert("❌ Invalid Password!\nMust contain Uppercase, Lowercase, Number, and Special character (e.g. $, @, #).");
+        return;
+    }
+
+    const updateData = {
+        userId: selectedUserId,
+        username: username,
+        password: password,
+        status: status
+    };
+
+    fetch('/sunrisedental_war_exploded/user', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+    })
+        .then(async response => {
+            const result = await response.json();
+            if (response.ok) {
+                alert("✅ User Credentials Updated Successfully!");
+                closeUpdateModal();
+                loadUsers();
+            } else {
+                alert("❌ Error: " + result.message);
+            }
+        })
+        .catch(err => {
+            console.error("Error updating user:", err);
+            alert("❌ Server connection error!");
+        });
 }
 
-function deleteUser(element) {
-    const row = element.closest('tr');
-    const userName = row.cells[1].innerText;
-
+// 4. Deactivate Account in Database
+function deleteUser(userId, userName) {
     if (confirm("Are you sure you want to deactivate account for " + userName + "?")) {
-        row.cells[5].innerHTML = `<span class="badge inactive">Inactive</span>`;
-        alert(userName + "'s account is now Inactive!");
+        const updateData = {
+            userId: userId,
+            status: "Inactive"
+        };
+
+        fetch('/sunrisedental_war_exploded/user', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData)
+        })
+            .then(async response => {
+                if (response.ok) {
+                    alert("✅ " + userName + "'s account is now Inactive!");
+                    loadUsers();
+                } else {
+                    alert("❌ Failed to deactivate user.");
+                }
+            })
+            .catch(err => console.error("Error deactivating user:", err));
     }
 }
