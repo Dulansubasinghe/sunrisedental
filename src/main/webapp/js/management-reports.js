@@ -20,7 +20,7 @@ function handlePeriodChange() {
 }
 
 function getDateRange(period) {
-    const today = new Date('2026-08-20');
+    const today = new Date();
     let start = new Date(today);
     let end = new Date(today);
 
@@ -29,13 +29,13 @@ function getDateRange(period) {
     } else if (period === 'THIS_WEEK') {
         const day = today.getDay();
         const diffToMon = today.getDate() - day + (day === 0 ? -6 : 1);
-        start = new Date(today.setDate(diffToMon));
+        start = new Date(today.getFullYear(), today.getMonth(), diffToMon);
         end = new Date(start);
         end.setDate(start.getDate() + 6);
     } else if (period === 'LAST_WEEK') {
         const day = today.getDay();
         const diffToLastMon = today.getDate() - day - 6 + (day === 0 ? -6 : 1);
-        start = new Date(today.setDate(diffToLastMon));
+        start = new Date(today.getFullYear(), today.getMonth(), diffToLastMon);
         end = new Date(start);
         end.setDate(start.getDate() + 6);
     } else if (period === 'THIS_MONTH') {
@@ -48,7 +48,13 @@ function getDateRange(period) {
         if (t) end = new Date(t);
     }
 
-    const formatDate = d => d.toISOString().split('T')[0];
+    const formatDate = d => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     return { start: formatDate(start), end: formatDate(end) };
 }
 
@@ -57,18 +63,129 @@ function applyFilters() {
     const selectedDoctor = document.getElementById('doctorFilter').value;
     const selectedTreatment = document.getElementById('treatmentFilter') ? document.getElementById('treatmentFilter').value : 'ALL';
     const range = getDateRange(period);
+
+    // Corrected Servlet URL
+    const url = `../ReportServlet?startDate=${range.start}&endDate=${range.end}&doctor=${encodeURIComponent(selectedDoctor)}&treatment=${encodeURIComponent(selectedTreatment)}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error("Servlet API not reachable, processing dynamic DOM rows");
+            return response.json();
+        })
+        .then(data => {
+            // Populate Doctors & Treatments Dropdowns
+            if (data.dentists || data.treatments) {
+                populateDropdowns(data.dentists, data.treatments);
+            }
+
+            let appointments = Array.isArray(data) ? data : (data.appointments || []);
+            renderReportData(appointments, selectedDoctor, selectedTreatment, range);
+        })
+        .catch(err => {
+            console.warn("Using DOM fallback mode:", err.message);
+            processDOMRows(selectedDoctor, selectedTreatment, range);
+        });
+}
+
+function populateDropdowns(dentists, treatments) {
+    const docSelect = document.getElementById('doctorFilter');
+    const treatSelect = document.getElementById('treatmentFilter');
+
+    if (dentists && docSelect && docSelect.options.length <= 1) {
+        dentists.forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            docSelect.appendChild(opt);
+        });
+    }
+
+    if (treatments && treatSelect && treatSelect.options.length <= 1) {
+        treatments.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = t;
+            treatSelect.appendChild(opt);
+        });
+    }
+}
+
+function renderReportData(appointments, selectedDoctor, selectedTreatment, range) {
+    const tbody = document.getElementById('reportTableBody');
+    tbody.innerHTML = '';
+
+    let totalRevenue = 0;
+    let totalPatients = 0;
+    let totalAppointments = 0;
+
+    const doctorStats = {};
+    const treatmentStats = {};
+
+    appointments.forEach(appt => {
+        const rDate = appt.appointmentDate || appt.date;
+        const rDoctor = appt.dentistName || appt.doctorName || 'Unassigned';
+        const rSpec = appt.specialization || 'Dental Specialist';
+        const rTreatment = appt.treatmentName || appt.treatment || 'General';
+        const rStatus = appt.status || 'Completed';
+        const rFee = parseFloat(appt.billingFee || appt.fee || 0);
+
+        const isCompleted = rStatus.toLowerCase() === 'completed';
+
+        let matchesDate = (!range.start || !range.end) || (rDate >= range.start && rDate <= range.end);
+        let matchesDoctor = (selectedDoctor === 'ALL' || rDoctor === selectedDoctor);
+        let matchesTreatment = (selectedTreatment === 'ALL' || rTreatment === selectedTreatment);
+
+        if (isCompleted && matchesDate && matchesDoctor && matchesTreatment) {
+            totalRevenue += rFee;
+            totalPatients++;
+            totalAppointments++;
+
+            if (!doctorStats[rDoctor]) {
+                doctorStats[rDoctor] = { spec: rSpec, patients: 0, revenue: 0 };
+            }
+            doctorStats[rDoctor].patients++;
+            doctorStats[rDoctor].revenue += rFee;
+
+            if (!treatmentStats[rTreatment]) {
+                treatmentStats[rTreatment] = { count: 0, revenue: 0 };
+            }
+            treatmentStats[rTreatment].count++;
+            treatmentStats[rTreatment].revenue += rFee;
+
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-date', rDate);
+            tr.setAttribute('data-doctor', rDoctor);
+            tr.setAttribute('data-treatment', rTreatment);
+            tr.setAttribute('data-fee', rFee);
+
+            tr.innerHTML = `
+                <td><strong>${appt.appointmentCode || appt.apptId || 'APT'}</strong></td>
+                <td>${rDate}</td>
+                <td>${appt.patientName || 'N/A'}</td>
+                <td>${rDoctor}</td>
+                <td>${rTreatment}</td>
+                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
+                <td class="amount-text">LKR ${rFee.toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        }
+    });
+
+    if (totalAppointments === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#6b7280; padding:16px;">No completed appointments found for selected filter</td></tr>`;
+    }
+
+    updateKPIsAndSummaries(totalRevenue, totalPatients, totalAppointments, doctorStats, treatmentStats);
+}
+
+function processDOMRows(selectedDoctor, selectedTreatment, range) {
     const rows = document.querySelectorAll('#reportTableBody tr');
 
     let totalRevenue = 0;
     let totalPatients = 0;
     let totalAppointments = 0;
 
-    const doctorStats = {
-        'Dr. Perera': { spec: 'Orthodontist', patients: 0, revenue: 0 },
-        'Dr. Silva': { spec: 'Dental Surgeon', patients: 0, revenue: 0 },
-        'Dr. Wickramasinghe': { spec: 'General Dentist', patients: 0, revenue: 0 }
-    };
-
+    const doctorStats = {};
     const treatmentStats = {};
 
     rows.forEach(row => {
@@ -76,33 +193,44 @@ function applyFilters() {
         const rDoctor = row.getAttribute('data-doctor');
         const rTreatment = row.getAttribute('data-treatment');
         const rFee = parseInt(row.getAttribute('data-fee')) || 0;
+        const rStatusText = row.children[5] ? row.children[5].innerText.trim() : 'Completed';
 
-        let matchesDate = (rDate >= range.start && rDate <= range.end);
+        const isCompleted = rStatusText.toLowerCase() === 'completed';
+
+        let matchesDate = (!range.start || !range.end) || (rDate >= range.start && rDate <= range.end);
         let matchesDoctor = (selectedDoctor === 'ALL' || rDoctor === selectedDoctor);
         let matchesTreatment = (selectedTreatment === 'ALL' || rTreatment === selectedTreatment);
 
-        if (matchesDate && matchesDoctor && matchesTreatment) {
+        if (isCompleted && matchesDate && matchesDoctor && matchesTreatment) {
             row.style.display = '';
             totalRevenue += rFee;
             totalPatients++;
             totalAppointments++;
 
-            if (doctorStats[rDoctor]) {
+            if (rDoctor) {
+                if (!doctorStats[rDoctor]) {
+                    doctorStats[rDoctor] = { spec: 'Dental Specialist', patients: 0, revenue: 0 };
+                }
                 doctorStats[rDoctor].patients++;
                 doctorStats[rDoctor].revenue += rFee;
             }
 
-            if (!treatmentStats[rTreatment]) {
-                treatmentStats[rTreatment] = { count: 0, revenue: 0 };
+            if (rTreatment) {
+                if (!treatmentStats[rTreatment]) {
+                    treatmentStats[rTreatment] = { count: 0, revenue: 0 };
+                }
+                treatmentStats[rTreatment].count++;
+                treatmentStats[rTreatment].revenue += rFee;
             }
-            treatmentStats[rTreatment].count++;
-            treatmentStats[rTreatment].revenue += rFee;
         } else {
             row.style.display = 'none';
         }
     });
 
-    // Update KPI Cards
+    updateKPIsAndSummaries(totalRevenue, totalPatients, totalAppointments, doctorStats, treatmentStats);
+}
+
+function updateKPIsAndSummaries(totalRevenue, totalPatients, totalAppointments, doctorStats, treatmentStats) {
     document.getElementById('kpiTotalRevenue').innerText = `LKR ${totalRevenue.toLocaleString()}`;
     document.getElementById('kpiTotalPatients').innerText = `${totalPatients} Patients`;
 
@@ -110,22 +238,23 @@ function applyFilters() {
         document.getElementById('kpiTotalAppointments').innerText = `${totalAppointments} Bookings`;
     }
 
-    // Dentist Summary Table Update
     const dBody = document.getElementById('dentistSummaryBody');
     dBody.innerHTML = '';
-
-    for (const [docName, data] of Object.entries(doctorStats)) {
-        dBody.innerHTML += `
-            <tr>
-                <td><strong>${docName}</strong></td>
-                <td>${data.spec}</td>
-                <td>${data.patients}</td>
-                <td class="amount-text">LKR ${data.revenue.toLocaleString()}</td>
-            </tr>
-        `;
+    if (Object.keys(doctorStats).length === 0) {
+        dBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#6b7280; padding:12px;">No doctor data available</td></tr>`;
+    } else {
+        for (const [docName, data] of Object.entries(doctorStats)) {
+            dBody.innerHTML += `
+                <tr>
+                    <td><strong>${docName}</strong></td>
+                    <td>${data.spec}</td>
+                    <td>${data.patients}</td>
+                    <td class="amount-text">LKR ${data.revenue.toLocaleString()}</td>
+                </tr>
+            `;
+        }
     }
 
-    // Treatment Summary Table Update
     const tBody = document.getElementById('treatmentSummaryBody');
     tBody.innerHTML = '';
     const chartLabels = [];
@@ -133,21 +262,25 @@ function applyFilters() {
     let topTreatmentName = '—';
     let maxTreatmentRev = -1;
 
-    for (const [tName, data] of Object.entries(treatmentStats)) {
-        if (data.revenue > maxTreatmentRev) {
-            maxTreatmentRev = data.revenue;
-            topTreatmentName = tName;
-        }
-        chartLabels.push(tName);
-        chartData.push(data.revenue);
+    if (Object.keys(treatmentStats).length === 0) {
+        tBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#6b7280; padding:12px;">No treatment data available</td></tr>`;
+    } else {
+        for (const [tName, data] of Object.entries(treatmentStats)) {
+            if (data.revenue > maxTreatmentRev) {
+                maxTreatmentRev = data.revenue;
+                topTreatmentName = tName;
+            }
+            chartLabels.push(tName);
+            chartData.push(data.revenue);
 
-        tBody.innerHTML += `
-            <tr>
-                <td>${tName}</td>
-                <td>${data.count}</td>
-                <td class="amount-text">LKR ${data.revenue.toLocaleString()}</td>
-            </tr>
-        `;
+            tBody.innerHTML += `
+                <tr>
+                    <td>${tName}</td>
+                    <td>${data.count}</td>
+                    <td class="amount-text">LKR ${data.revenue.toLocaleString()}</td>
+                </tr>
+            `;
+        }
     }
 
     document.getElementById('kpiTopTreatment').innerText = topTreatmentName;
