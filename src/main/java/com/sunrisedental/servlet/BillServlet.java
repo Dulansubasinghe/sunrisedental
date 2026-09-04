@@ -14,6 +14,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/bill")
 public class BillServlet extends HttpServlet {
@@ -27,7 +28,7 @@ public class BillServlet extends HttpServlet {
         gson = new Gson();
     }
 
-    // 1. Search Bill by Bill Number / Bill ID OR Get All Bills
+    // get bill details by appointment code, bill ID,
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,16 +37,27 @@ public class BillServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
+        String appointmentCode = request.getParameter("appointmentCode");
         String billNumber = request.getParameter("billNumber");
         String billIdParam = request.getParameter("billId");
 
-        if (billNumber != null && !billNumber.trim().isEmpty()) {
-            // Search by Bill Number (උදා: BILL-1001)
-            Bill bill = billDAO.getBillByNumber(billNumber);
+        if (appointmentCode != null && !appointmentCode.trim().isEmpty()) {
+            // Get billing info by appointment code
+            Map<String, Object> details = billDAO.getBillingDetailsByCode(appointmentCode.trim());
+            if (details != null) {
+                out.print(gson.toJson(details));
+            } else {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                out.print("{\"status\":\"error\", \"message\":\"No appointment found for code: " + appointmentCode + "\"}");
+            }
+
+        } else if (billNumber != null && !billNumber.trim().isEmpty()) {
+            // Search by Bill Number
+            Bill bill = billDAO.getBillByNumber(billNumber.trim());
             out.print(gson.toJson(bill));
 
         } else if (billIdParam != null && !billIdParam.trim().isEmpty()) {
-            // Search by Primary Key Bill ID
+            // Search by Bill ID
             try {
                 int billId = Integer.parseInt(billIdParam);
                 Bill bill = billDAO.getBillById(billId);
@@ -56,7 +68,7 @@ public class BillServlet extends HttpServlet {
             }
 
         } else {
-            // Parameter නොමැති විට සියලුම Bills ලබා දේ
+            // Get All Bills
             List<Bill> list = billDAO.getAllBills();
             out.print(gson.toJson(list));
         }
@@ -76,14 +88,30 @@ public class BillServlet extends HttpServlet {
             BufferedReader reader = request.getReader();
             Bill bill = gson.fromJson(reader, Bill.class);
 
+            if (bill == null || bill.getAppointmentId() <= 0) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                out.print("{\"status\":\"error\", \"message\":\"Invalid Appointment ID.\"}");
+                out.flush();
+                return;
+            }
+
+            // Auto-generate bill number if not provided
+            if (bill.getBillNumber() == null || bill.getBillNumber().trim().isEmpty()) {
+                bill.setBillNumber("BILL-" + (System.currentTimeMillis() % 100000));
+            }
+
+            // Total Amount reCalculate
+            double total = bill.getConsultationFee() + bill.getTreatmentCost();
+            bill.setTotalAmount(total);
+
             boolean isSuccess = billDAO.addBill(bill);
 
             if (isSuccess) {
                 response.setStatus(HttpServletResponse.SC_CREATED);
-                out.print("{\"status\":\"success\", \"message\":\"Bill created successfully!\"}");
+                out.print("{\"status\":\"success\", \"message\":\"Bill saved successfully!\", \"billNumber\":\"" + bill.getBillNumber() + "\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print("{\"status\":\"error\", \"message\":\"Failed to create bill.\"}");
+                out.print("{\"status\":\"error\", \"message\":\"Failed to save bill in database.\"}");
             }
         } catch (Exception e) {
             e.printStackTrace();

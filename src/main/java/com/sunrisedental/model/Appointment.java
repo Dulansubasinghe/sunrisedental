@@ -14,10 +14,17 @@ public class Appointment implements Serializable {
     private int treatmentId;
     private String status;
 
-    // Optional Display Fields
+    // Optional Display & DTO Fields
     private String patientName;
     private String dentistName;
     private String treatmentName;
+    private String contactNumber;
+    private String address; // Extract address parameter from frontend request
+
+    // Fields for total, consultation, and treatment fees
+    private double consultationFee;
+    private double treatmentFee;
+    private double totalFee;
 
     // Default Constructor
     public Appointment() {
@@ -123,5 +130,46 @@ public class Appointment implements Serializable {
 
     public void setTreatmentName(String treatmentName) {
         this.treatmentName = treatmentName;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    // 3Getters and Setters for Fees
+    public double getConsultationFee() {
+        return consultationFee;
+    }
+
+    public void setConsultationFee(double consultationFee) {
+        this.consultationFee = consultationFee;
+    }
+
+    public double getTreatmentFee() {
+        return treatmentFee;
+    }
+
+    public void setTreatmentFee(double treatmentFee) {
+        this.treatmentFee = treatmentFee;
+    }
+
+    public double getTotalFee() {
+        return totalFee;
+    }
+
+    public void setTotalFee(double totalFee) {
+        this.totalFee = totalFee;
     }
 }
