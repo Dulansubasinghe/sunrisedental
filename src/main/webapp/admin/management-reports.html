@@ -73,9 +73,6 @@
             <label for="doctorFilter">👨‍⚕️ Filter by Dentist</label>
             <select id="doctorFilter" class="form-control" onchange="applyFilters()">
                 <option value="ALL">All Dentists</option>
-                <option value="Dr. Perera">Dr. Perera</option>
-                <option value="Dr. Silva">Dr. Silva</option>
-                <option value="Dr. Wickramasinghe">Dr. Wickramasinghe</option>
             </select>
         </div>
 
@@ -84,11 +81,6 @@
             <label for="treatmentFilter">🦷 Filter by Treatment</label>
             <select id="treatmentFilter" class="form-control" onchange="applyFilters()">
                 <option value="ALL">All Treatments</option>
-                <option value="Dental Braces">Dental Braces</option>
-                <option value="Tooth Extraction">Tooth Extraction</option>
-                <option value="Dental Filling">Dental Filling</option>
-                <option value="Root Canal">Root Canal</option>
-                <option value="Teeth Cleaning">Teeth Cleaning</option>
             </select>
         </div>
 
@@ -171,35 +163,7 @@
                 <th>Billing Fee</th>
             </tr>
             </thead>
-            <tbody id="reportTableBody">
-            <tr data-date="2026-08-20" data-doctor="Dr. Perera" data-treatment="Dental Braces" data-fee="82000">
-                <td><strong>APT-1001</strong></td>
-                <td>2026-08-20</td>
-                <td>Nimal Fernando</td>
-                <td>Dr. Perera</td>
-                <td>Dental Braces</td>
-                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
-                <td class="amount-text">LKR 82,000</td>
-            </tr>
-            <tr data-date="2026-08-20" data-doctor="Dr. Silva" data-treatment="Tooth Extraction" data-fee="10000">
-                <td><strong>APT-1002</strong></td>
-                <td>2026-08-20</td>
-                <td>Kasun Jayasinghe</td>
-                <td>Dr. Silva</td>
-                <td>Tooth Extraction</td>
-                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
-                <td class="amount-text">LKR 10,000</td>
-            </tr>
-            <tr data-date="2026-08-19" data-doctor="Dr. Wickramasinghe" data-treatment="Dental Filling" data-fee="12000">
-                <td><strong>APT-1003</strong></td>
-                <td>2026-08-19</td>
-                <td>Sunil Perera</td>
-                <td>Dr. Wickramasinghe</td>
-                <td>Dental Filling</td>
-                <td><span style="color: #059669; font-weight: 600;">Completed</span></td>
-                <td class="amount-text">LKR 12,000</td>
-            </tr>
-            </tbody>
+            <tbody id="reportTableBody"></tbody>
         </table>
     </div>
 

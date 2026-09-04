@@ -38,7 +38,7 @@
         <!-- Search Card -->
         <div class="card search-card">
             <div class="search-group">
-                <input type="text" id="apptSearchInput" class="form-control" placeholder="Enter Appointment ID, e.g., APT-1001..." value="APT-1001">
+                <input type="text" id="apptSearchInput" class="form-control" placeholder="Enter Appointment Code, e.g., APT-1001..." value="APT-1001">
                 <button type="button" class="btn-load" onclick="loadBillData()">🔍 Load Bill</button>
             </div>
         </div>
@@ -49,25 +49,25 @@
 
             <!-- Patient Summary Strip -->
             <div class="patient-info-strip">
-                <strong>Patient:</strong> <span id="pName">Nimal Fernando</span> &nbsp;|&nbsp;
-                <strong>Token:</strong> <span id="pToken">APT-1001</span> &nbsp;|&nbsp;
-                <strong>Doctor:</strong> <span id="pDoctor">Dr. Perera</span>
+                <strong>Patient:</strong> <span id="pName">-</span> &nbsp;|&nbsp;
+                <strong>Token:</strong> <span id="pToken">-</span> &nbsp;|&nbsp;
+                <strong>Doctor:</strong> <span id="pDoctor">-</span>
             </div>
 
             <!-- Charges List -->
             <div class="charge-row">
-                <span>Doctor Consultation Fee: LKR 2,000</span>
-                <span id="feeConsultation">LKR 2,000</span>
+                <span>Doctor Consultation Fee:</span>
+                <span id="feeConsultation">LKR 0.00</span>
             </div>
             <div class="charge-row">
-                <span>Root Canal Treatment: LKR 25,000</span>
-                <span id="feeTreatment">LKR 25,000</span>
+                <span id="lblTreatmentName">Treatment Cost:</span>
+                <span id="feeTreatment">LKR 0.00</span>
             </div>
 
             <!-- Total Payable Bar -->
             <div class="total-payable-box">
                 <span>Total Payable Amount:</span>
-                <span class="total-payable-amount" id="lblTotalPayable">LKR 27,000</span>
+                <span class="total-payable-amount" id="lblTotalPayable">LKR 0.00</span>
             </div>
 
             <!-- Payment Method Selector -->
@@ -102,30 +102,30 @@
             <div class="receipt-title">SUNRISE DENTAL CLINIC - COLOMBO</div>
             <div class="receipt-subtext">AddressDental Clinic, Colombo,</div>
             <div class="receipt-subtext">Cto/ita A30 - 20593</div>
-            <div class="receipt-subtext" style="margin-top:4px;">Aug 20, 2026 - 10:30 AM</div>
+            <div class="receipt-subtext" id="recDate" style="margin-top:4px;">-</div>
 
             <hr class="receipt-dashed-line">
 
             <div class="receipt-meta">
-                Token #<span id="recToken">APT-1001</span><br>
-                Patient: <span id="recPatient">Nimal Fernando</span><br>
-                Dentist: <span id="recDoctor">Dr. Perera</span>
+                Token #<span id="recToken">-</span><br>
+                Patient: <span id="recPatient">-</span><br>
+                Dentist: <span id="recDoctor">-</span>
             </div>
 
             <hr class="receipt-dashed-line">
 
             <div class="receipt-item-row">
                 <span>Consultation Fee:</span>
-                <span>LKR 2,000.00</span>
+                <span id="recFeeConsultation">LKR 0.00</span>
             </div>
             <div class="receipt-item-row">
-                <span>Root Canal Treatment:</span>
-                <span>LKR 25,000.00</span>
+                <span id="recTreatmentName">Treatment Charge:</span>
+                <span id="recFeeTreatment">LKR 0.00</span>
             </div>
 
             <div class="receipt-total-bar">
                 <span>TOTAL DUE:</span>
-                <span id="recTotal">LKR 27,000.00</span>
+                <span id="recTotal">LKR 0.00</span>
             </div>
 
             <div class="barcode-area">
@@ -134,13 +134,14 @@
             <div class="thank-you-msg">Thank you for visiting Sunrise Dental Clinic!</div>
         </div>
 
-        <!-- print recipt button  -->
+        <!-- Print Receipt Button -->
         <button type="button" class="btn-print-official" onclick="window.print()">
             🖨️ Print Official Receipt
         </button>
     </div>
 
 </div>
+
 <script src="../js/billing.js"></script>
 </body>
 </html>

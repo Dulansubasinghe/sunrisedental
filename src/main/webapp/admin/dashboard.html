@@ -25,59 +25,8 @@
 
 <div class="dashboard-container">
 
-    <!-- Section 1: Executive KPI Summary -->
+    <!-- Management Controls -->
     <div class="section-header">
-        <div>
-            <h2>Executive Clinic Summary</h2>
-            <p>Real-time analytics and financial metrics</p>
-        </div>
-        <div class="filter-box">
-            <select id="analyticsFilter">
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month" selected>This Month</option>
-                <option value="all">All Time</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="kpi-grid">
-        <!-- Total Revenue Card (Clickable to open management reports) -->
-        <div class="kpi-card clickable" onclick="window.location.href='management-reports.html'">
-            <div class="kpi-icon revenue">💵</div>
-            <div class="kpi-info">
-                <span>Total Revenue ↗</span>
-                <h3>LKR 450,000</h3>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-icon appointments">📅</div>
-            <div class="kpi-info">
-                <span>Total Appointments</span>
-                <h3>128</h3>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-icon patients">👥</div>
-            <div class="kpi-info">
-                <span>Registered Patients</span>
-                <h3>84</h3>
-            </div>
-        </div>
-
-        <div class="kpi-card">
-            <div class="kpi-icon dentists">🩺</div>
-            <div class="kpi-info">
-                <span>Active Dentists</span>
-                <h3>05</h3>
-            </div>
-        </div>
-    </div>
-
-    <!-- Section 2: Management Controls -->
-    <div class="section-header" style="margin-top: 36px;">
         <div>
             <h2>System Management</h2>
             <p>Configure staff, dental practitioners, and view management reports</p>
@@ -106,7 +55,6 @@
             <button class="btn-action" onclick="window.location.href='manage-treatments.html'">Open Panel</button>
         </div>
 
-        <!-- 4th Action Card added for Reports -->
         <div class="action-card">
             <div class="action-icon">📊</div>
             <h3>Management Reports</h3>

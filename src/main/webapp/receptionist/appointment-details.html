@@ -53,9 +53,6 @@
 
         <select id="doctorFilter" class="form-control filter-select" onchange="filterTable()">
             <option value="ALL">All Doctors</option>
-            <option value="Dr. Perera">Dr. Perera</option>
-            <option value="Dr. Silva">Dr. Silva</option>
-            <option value="Dr. Wickramasinghe">Dr. Wickramasinghe</option>
         </select>
     </div>
 
@@ -75,35 +72,9 @@
             </tr>
             </thead>
             <tbody id="tableBody">
+            <!-- Dynamic Data Load From Backend JS -->
             <tr>
-                <td><strong>APT-1001</strong></td>
-                <td>Nimal Fernando</td>
-                <td>0771234567</td>
-                <td>Dr. Perera — Orthodontist</td>
-                <td>Dental Braces</td>
-                <td>2026-08-20 | 10:30 AM</td>
-                <td><span class="badge badge-completed">● Completed</span></td>
-                <td><button class="btn-action" onclick="openModal('APT-1001', 'Nimal Fernando', '0771234567', 'Dr. Perera — Orthodontist', 'Dental Braces', '2026-08-20 | 10:30 AM', 'Completed', '24 Galle Road, Colombo 03', 'LKR 82,000')">View</button></td>
-            </tr>
-            <tr>
-                <td><strong>APT-1002</strong></td>
-                <td>Kasun Jayasinghe</td>
-                <td>0719876543</td>
-                <td>Dr. Silva — Dental Surgeon</td>
-                <td>Tooth Extraction</td>
-                <td>2026-08-20 | 02:00 PM</td>
-                <td><span class="badge badge-pending">● Pending</span></td>
-                <td><button class="btn-action" onclick="openModal('APT-1002', 'Kasun Jayasinghe', '0719876543', 'Dr. Silva — Dental Surgeon', 'Tooth Extraction', '2026-08-20 | 02:00 PM', 'Pending', '15 Kandy Road, Kadawatha', 'LKR 10,000')">View</button></td>
-            </tr>
-            <tr>
-                <td><strong>APT-1003</strong></td>
-                <td>Sunil Perera</td>
-                <td>0754443322</td>
-                <td>Dr. Wickramasinghe — General</td>
-                <td>Dental Filling</td>
-                <td>2026-08-21 | 09:00 AM</td>
-                <td><span class="badge badge-pending">● Pending</span></td>
-                <td><button class="btn-action" onclick="openModal('APT-1003', 'Sunil Perera', '0754443322', 'Dr. Wickramasinghe — General', 'Dental Filling', '2026-08-21 | 09:00 AM', 'Pending', '88 Main Street, Nittambuwa', 'LKR 12,000')">View</button></td>
+                <td colspan="8" style="text-align: center; padding: 20px;">Loading appointments...</td>
             </tr>
             </tbody>
         </table>
@@ -171,12 +142,18 @@
         <div class="modal-footer">
             <button class="btn-modal-delete" onclick="deleteAppointment()">🗑 Delete</button>
             <div class="modal-footer-right">
-                <button class="btn-modal-close" onclick="closeModal()">Close Window</button>
+                <!-- Close Window Button එක වෙනුවට Status Edit Dropdown එක යොදා ඇත -->
+                <select id="mStatusSelect" class="form-control" style="padding: 6px 12px; font-size: 14px; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer; background-color: #ffffff;">
+                    <option value="Pending">Pending</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
                 <button class="btn-modal-save" onclick="saveContactNumber()">💾 Save Changes</button>
             </div>
         </div>
     </div>
 </div>
+
 <script src="../js/appointment-details.js"></script>
 </body>
 </html>

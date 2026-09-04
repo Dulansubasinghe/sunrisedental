@@ -52,7 +52,8 @@
             <div class="card-icon icon-green" style="margin-bottom:0;">📅</div>
             <div>
                 <div class="card-desc">Today's Appointments</div>
-                <div class="today-count">14</div>
+                <!-- 🔴 Dynamic JS Target ID -->
+                <div class="today-count" id="todayCount">0</div>
             </div>
         </div>
     </div>
@@ -64,19 +65,9 @@
             <div class="card-desc">Active Dentists</div>
         </div>
 
-        <div class="dentist-list">
-            <div class="dentist-item">
-                <span class="dentist-name">Dr. Perera — <span style="font-weight:400; color:#64748b;">Orthodontist</span></span>
-                <span class="badge-available"><span class="status-dot"></span> Available</span>
-            </div>
-            <div class="dentist-item">
-                <span class="dentist-name">Dr. Silva — <span style="font-weight:400; color:#64748b;">Dental Surgeon</span></span>
-                <span class="badge-consulting"><span class="status-dot" style="background:#d97706;"></span> In-Consultation</span>
-            </div>
-            <div class="dentist-item">
-                <span class="dentist-name">Dr. Wickramasinghe — <span style="font-weight:400; color:#64748b;">General</span></span>
-                <span class="badge-available"><span class="status-dot"></span> Available</span>
-            </div>
+        <!-- 🔴 Dynamic JS Target ID Container -->
+        <div class="dentist-list" id="dentistList">
+            <div style="color:#64748b; font-size:13px;">Loading dentists...</div>
         </div>
     </div>
 </section>
@@ -169,6 +160,7 @@
         </div>
     </div>
 </div>
+
 <script src="../js/dashboard.js"></script>
 </body>
 </html>

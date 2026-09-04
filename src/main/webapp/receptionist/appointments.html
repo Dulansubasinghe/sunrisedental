@@ -47,58 +47,59 @@
             </div>
         </div>
 
-        <form id="appointmentForm">
+        <form id="appointmentForm" autocomplete="off">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="appointmentNo">Appointment No (Auto)</label>
-                    <input type="text" id="appointmentNo" name="appointmentNo" class="form-control" readonly>
+                    <input type="text" id="appointmentNo" name="appointmentNo" class="form-control" readonly placeholder="Generating...">
                 </div>
 
                 <div class="form-group">
                     <label for="contact">Contact Number (10 Digits)</label>
-                    <input type="text" id="contact" name="contact" class="form-control" placeholder="07XXXXXXXX" maxlength="10">
+                    <input type="text" id="contact" name="contact" class="form-control" placeholder="07XXXXXXXX" maxlength="10" required>
                 </div>
 
                 <div class="form-group">
                     <label for="patientName">Patient Full Name</label>
-                    <input type="text" id="patientName" name="patientName" class="form-control" placeholder="e.g. Nimal Fernando">
+                    <input type="text" id="patientName" name="patientName" class="form-control" placeholder="e.g. Nimal Fernando" required>
                 </div>
 
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" id="address" name="address" class="form-control" placeholder="e.g. 24 Galle Road, Colombo 03">
+                    <input type="text" id="address" name="address" class="form-control" placeholder="e.g. 24 Galle Road, Colombo 03" required>
                 </div>
 
-                <!-- Step 6: Swapped - Treatment Type First -->
+                <!-- Treatment Type (Dynamically Populated via JS) -->
                 <div class="form-group">
                     <label for="treatment">Treatment Type</label>
-                    <select id="treatment" name="treatmentType" class="form-control">
-                        <option value="">-- Select Treatment --</option>
-                        <option value="General Cleaning" data-price="5000">General Cleaning — LKR 5,000</option>
-                        <option value="Tooth Extraction" data-price="8000">Tooth Extraction — LKR 8,000</option>
-                        <option value="Teeth Whitening" data-price="15000">Teeth Whitening — LKR 15,000</option>
-                        <option value="Root Canal Treatment" data-price="25000">Root Canal Treatment — LKR 25,000</option>
-                        <option value="Dental Filling" data-price="10000">Dental Filling — LKR 10,000</option>
-                        <option value="Dental Braces" data-price="80000">Dental Braces — LKR 80,000</option>
+                    <select id="treatment" name="treatmentType" class="form-control" required>
+                        <option value="">-- Loading Treatments... --</option>
                     </select>
                 </div>
 
-                <!-- Step 6: Swapped - Dentist Second -->
+                <!-- Dentist (Dynamically Populated via JS) -->
                 <div class="form-group">
                     <label for="dentist">Dentist</label>
-                    <select id="dentist" name="doctorId" class="form-control">
-                        <option value="">-- Select Treatment First --</option>
+                    <select id="dentist" name="doctorId" class="form-control" required>
+                        <option value="">-- Loading Dentists... --</option>
                     </select>
                 </div>
 
+                <!-- Consultation Fee Field with Checkbox -->
                 <div class="form-group">
-                    <label for="consultationFee">Consultation Fee (LKR)</label>
-                    <input type="number" id="consultationFee" name="consultationFee" class="form-control" placeholder="e.g. 2000" value="2000">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label for="consultationFee" style="margin: 0;">Consultation Fee (LKR)</label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: #059669; font-weight: 600;">
+                            <input type="checkbox" id="chkConsultation" name="includeConsultation" checked>
+                            Include Fee
+                        </label>
+                    </div>
+                    <input type="number" id="consultationFee" name="consultationFee" class="form-control" placeholder="e.g. 2000" value="2000" required>
                 </div>
 
                 <div class="form-group">
                     <label for="appointmentDate">Date & Time</label>
-                    <input type="datetime-local" id="appointmentDate" name="appointmentDate" class="form-control">
+                    <input type="datetime-local" id="appointmentDate" name="appointmentDate" class="form-control" required>
                 </div>
             </div>
 
@@ -107,12 +108,12 @@
             </button>
 
             <!-- Success Alert -->
-            <div id="alertSuccess" class="alert-success">
+            <div id="alertSuccess" class="alert-success" style="display: none;">
                 <span>✔</span> <span id="successMsg">Appointment registered. Receipt generated below.</span>
             </div>
 
             <!-- Error Alert -->
-            <div id="alertError" class="alert-error">
+            <div id="alertError" class="alert-error" style="display: none;">
                 <span>⚠️</span> <span id="errorMsgText">Please fill in all required details before registering the appointment.</span>
             </div>
         </form>
@@ -168,6 +169,7 @@
     </div>
 
 </div>
+
 <script src="../js/appointment.js"></script>
 </body>
 </html>
